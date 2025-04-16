@@ -1,3 +1,4 @@
+import mariadb
 from fastapi import APIRouter, Depends, HTTPException, Form
 
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
