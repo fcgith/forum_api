@@ -8,9 +8,9 @@ ALGORITHM = "HS256" # JWT encoding algorithm
 SECRET_KEY = "fh8q247ghf0qb8374fhq2847hf0q89734gfh7" # JWT encoding secret key
 
 
-def generate_token(data: dict):
+def generate_token(data: dict) -> str:
     """
-    Creates an authentication token from provided data
+    Generates an authentication token from provided data
     :param data: dict with data to encode
     :return: str with JWT token
     """
@@ -24,9 +24,9 @@ def generate_token(data: dict):
     #return encoded JWT token
     return jwt.encode(encode_data, SECRET_KEY, algorithm=ALGORITHM)
 
-def decode_token(token: str):
+def decode_token(token: str) -> dict:
     """
-    Decodes JWT token
+    Decodes an authentication token
     :param token: str with JWT token
     :return: dict with decoded data
     """

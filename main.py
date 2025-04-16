@@ -1,10 +1,10 @@
 from fastapi import FastAPI
+from routers.auth import router as auth_router
 
 app = FastAPI()
 
 # routers go here
-#
-# app.include_router(....)
+app.include_router(auth_router, prefix="/auth")
 
 
 if __name__ == "__main__":
