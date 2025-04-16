@@ -4,7 +4,7 @@ import mariadb
 
 
 @contextmanager
-def get_db():
+def get_db_connection():
     """
     Establish a connection to the MariaDB database and ensure it closes after use.
     :yield: Active database connection object.
@@ -25,3 +25,7 @@ def get_db():
     finally:
         if conn:
             conn.close()
+
+def get_db():
+    with get_db_connection() as conn:
+        yield conn
