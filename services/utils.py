@@ -19,7 +19,7 @@ def generate_token(data: dict) -> str:
     encode_data = data.copy()
 
     # set expiry time for the authentication token
-    encode_data['exp'] = datetime.now() + timedelta(minutes=60) # 1 hour
+    encode_data['exp'] = datetime.now() + timedelta(minutes=60*8) # 8 hours
 
     #return encoded JWT token
     return jwt.encode(encode_data, SECRET_KEY, algorithm=ALGORITHM)
