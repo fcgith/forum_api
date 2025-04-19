@@ -1,7 +1,5 @@
-from contextlib import contextmanager
-
+from typing import Any
 import mariadb
-from fastapi import Depends
 from mariadb import Cursor, Connection
 
 def get_db() -> Connection | None:
@@ -23,7 +21,7 @@ def get_db() -> Connection | None:
         print(f"Error connecting to MariaDB: {e}")
         raise
 
-def read_query(query, params=(), db = Depends(get_db)):
+def read_query(query, params=()):
     """
     Executes a SQL query against the provided database connection and returns the
     fetched results or None if no data is found.
@@ -35,10 +33,10 @@ def read_query(query, params=(), db = Depends(get_db)):
             cursor.execute(query, params)
             return cursor
     except mariadb.Error as e:
-        print(f"Error executing query: {e}")
+        print(f"Error executing read query: {e}")
         raise
 
-def insert_query(query, params=()) -> id:
+def insert_query(query, params=()) -> int | None:
     """
     Executes an insert SQL query and commits the transaction to the database. Returns the
     ID of the inserted row.
@@ -51,10 +49,10 @@ def insert_query(query, params=()) -> id:
             db.commit()
             return cursor.lastrowid
     except mariadb.Error as e:
-        print(f"Error executing query: {e}")
+        print(f"Error executing insert query: {e}")
         raise
 
-def update_query(query, params=(), db = Depends(get_db)) -> int:
+def update_query(query, params=(),) -> Any | None:
     """
     Executes an update query on the database with given parameters and commits the transaction.
 
@@ -62,7 +60,13 @@ def update_query(query, params=(), db = Depends(get_db)) -> int:
     and a database connection object. It executes the query and commits the changes to
     the database. The function then returns the number of rows affected by the query.
     """
-    cursor = db.cursor()
-    cursor.execute(query, params)
-    db.commit()
-    return cursor.rowcount
+    try:
+        db = get_db()
+        if db:
+            cursor = db.cursor()
+            cursor.execute(query, params)
+            db.commit()
+            return cursor.rowcount
+    except mariadb.Error as e:
+        print(f"Error executing update query: {e}")
+        raise
