@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, Form
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
 from repo.connection import get_db
 from services.errors import not_implemented, not_found, access_denied, internal_error
-from services.utils import generate_token, decode_token
+from services.utils import AuthToken
 from repo import user as user
 
 router = APIRouter(tags=["auth"])
@@ -23,7 +23,7 @@ async def login(user_data: UserLogin) -> LoginResponse:
         password = user_data.password
         if user_db[2] != password:
             raise access_denied
-        token = generate_token({"username": username, })
+        token = AuthToken.generate({"username": username})
         return LoginResponse(access_token=token, token_type="bearer")
     else:
         raise not_found
