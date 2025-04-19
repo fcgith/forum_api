@@ -49,6 +49,7 @@ def insert_query(query, params=()) -> id:
             cursor = db.cursor()
             cursor.execute(query, params)
             db.commit()
+            return cursor.lastrowid
     except mariadb.Error as e:
         print(f"Error executing query: {e}")
         raise
