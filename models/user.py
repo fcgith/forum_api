@@ -1,7 +1,5 @@
 from pydantic import BaseModel
 
-from ..repo.user import get_user_by_username
-
 
 class User(BaseModel):
     id: int | None

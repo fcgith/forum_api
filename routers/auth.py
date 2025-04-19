@@ -1,9 +1,7 @@
 import mariadb
-from fastapi import APIRouter, Depends, HTTPException, Form
-
+from fastapi import APIRouter
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
-from repo.connection import get_db
-from services.errors import not_implemented, not_found, access_denied, internal_error
+from services.errors import not_found, access_denied, internal_error
 from services.utils import AuthToken
 from repo import user as user
 
