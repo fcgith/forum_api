@@ -1,3 +1,5 @@
+from datetime import datetime, date
+
 from pydantic import BaseModel
 
 
@@ -6,12 +8,11 @@ class User(BaseModel):
     username: str
     password: str
     email: str
-    birthday: int
-    nickname: str | None = None
-    admin: bool = False
+    birthday: date
     avatar: str | None = None
-    creation_date: str | None = None
+    admin: int = 0
+    creation_date: date
 
     def is_admin(self):
-        return self.role == 'admin'
+        return bool(self.admin)
 

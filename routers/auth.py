@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
 from services.errors import not_found, access_denied, internal_error
 from services.utils import AuthToken
-from repo import user as user
+from repo import user as user_db
 
 router = APIRouter(tags=["auth"])
 
@@ -16,15 +16,15 @@ async def login(user_data: UserLogin) -> LoginResponse:
     """
 
     username = user_data.username
-    user_db = user.get_user_by_username(username)
-    if user_db:
+    user = user_db.get_user_by_username(username)
+    if user:
         password = user_data.password
-        if user_db[2] != password:
+        if user.password != password:
             raise access_denied
         token = AuthToken.generate({"username": username})
         return LoginResponse(access_token=token, token_type="bearer")
     else:
-        raise not_found
+        raise access_denied
 
 @router.post("/register", response_model=RegisterResponse)
 async def register(user_data: UserCreate) -> RegisterResponse:
@@ -45,10 +45,8 @@ async def register(user_data: UserCreate) -> RegisterResponse:
             print(data)
             raise internal_error
         else:
-            insert_query = """INSERT INTO users (username, password, email) VALUES (?, ?, ?)"""
-            user_id = user.insert_query(insert_query, (data.username, data.password, data.email))
+            created_id = user_db.insert_user(data)
+            return RegisterResponse(message=f"User {created_id} created successfully")
 
-        return RegisterResponse(message=f"User {user_id} created successfully")
-
-    except mariadb.Error as e:
+    except Exception as e:
         raise internal_error
