@@ -17,23 +17,27 @@ def gen_user(result: tuple):
         creation_date=result[7]
     )
 
-def get_user_by_id(user_id: int) -> User:
+def get_user_by_id(user_id: int) -> User | None:
     try:
         query = "SELECT * FROM users WHERE id = ?"
-        result = read_query(query, (user_id,)).fetchone()
-        return gen_user(result)
+        result = read_query(query, (user_id,))
+        if result:
+            return gen_user(result[0])
+        else:
+            return None
     except Exception as e:
         print(e)
-        raise e
-        raise not_found
 
-def get_user_by_username(username: str) -> User:
+def get_user_by_username(username: str) -> User | None:
     try:
         query = "SELECT * FROM users WHERE username = ?"
-        result = read_query(query, (username,)).fetchone()
-        return gen_user(result)
+        result = read_query(query, (username,))
+        if result:
+            return gen_user(result[0])
+        else:
+            return None
     except Exception as e:
-        raise not_found
+        print(e)
 
 def insert_user(data: UserCreate) -> int | None:
     try:
@@ -46,4 +50,3 @@ def insert_user(data: UserCreate) -> int | None:
         return result
     except Exception as e:
         print(e)
-

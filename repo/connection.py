@@ -1,79 +1,78 @@
 from contextlib import contextmanager
-from typing import Any, Generator
+from typing import Any, Generator, List, Tuple
 import mariadb
-from mariadb import Connection
+from fastapi import Depends
+from mariadb import Connection, ConnectionPool
 
-from services.errors import internal_error
+pool = ConnectionPool(
+    pool_name="forum_pool",
+    pool_size=5,
+    host="172.245.56.116",
+    port=3600,
+    user="root",
+    password="root",
+    database="forum"
+)
 
-@contextmanager
-def get_db() -> Generator[Connection, None, None]:
+def get_db() -> Connection:
     """
-    Establish a connection to the MariaDB database and ensure it closes after use.
-    :yield: Active database connection object.
+    Provides a database connection from the connection pool.
+    Note: Connection should be closed by the caller or managed via context.
     """
     conn = None
     try:
-        conn = mariadb.connect(
-            host="172.245.56.116",
-            port=3600,
-            user="root",
-            password="root",
-            database="forum"
-        )
-        yield conn
+        conn = pool.get_connection()
+        return conn
     except mariadb.Error as e:
-        print(f"Error connecting to MariaDB: {e}")
-        raise internal_error
+        print(f"Error connecting to MariaDB database: {e}")
+        raise
     finally:
         if conn:
             conn.close()
 
-def read_query(query, params=()):
+def read_query(query: str, params: () = ()) -> List[Tuple] | None:
     """
-    Executes a SQL query against the provided database connection and returns the
-    fetched results or None if no data is found.
+    Executes a SQL query against the provided database connection.
+    Returns the fetched results as a list of tuples or None if an error occurs.
     """
-    try:
-        with get_db() as db:
-            if db:
-                cursor = db.cursor()
-                cursor.execute(query, params)
-                return cursor
-    except Exception as e:
-        print(f"Error executing read query: {e}")
-        raise internal_error
+    with get_db() as db:
+        cursor = None
+        try:
+            cursor = db.cursor()
+            cursor.execute(query, params)
+            return list(cursor)
+        except Exception as e:
+            print(f"Error executing read query: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
 
-def insert_query(query, params=()) -> int | None:
-    """
-    Executes an insert SQL query and commits the transaction to the database. Returns the
-    ID of the inserted row.
-    """
-    try:
-        with get_db() as db:
-            if db:
-                cursor = db.cursor()
-                cursor.execute(query, params)
-                db.commit()
-                return cursor.lastrowid
-    except Exception as e:
-        print(f"Error executing insert query: {e}")
-        raise internal_error
+def affect_query(qtype: int, query: str, params: ()) -> int | None:
+    with get_db() as db:
+        cursor = None
+        try:
+            cursor = db.cursor()
+            cursor.execute(query, params)
+            db.commit()
+            return cursor.lastrowid if qtype == 0 else cursor.rowcount
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
 
-def update_query(query, params=(),) -> Any | None:
+def insert_query(query: str, params: () = ()) -> int | None:
     """
-    Executes an update query on the database with given parameters and commits the transaction.
+    Executes an insert SQL query and commits the transaction to the database.
+    Returns the ID of the inserted row.
+    """
+    return affect_query(0, query, params)
 
-    The function takes a SQL query string, optional parameters to be bound to the query,
-    and a database connection object. It executes the query and commits the changes to
-    the database. The function then returns the number of rows affected by the query.
+def update_query(query: str, params: () = ()) -> int | None:
     """
-    try:
-        with get_db() as db:
-            if db:
-                cursor = db.cursor()
-                cursor.execute(query, params)
-                db.commit()
-                return cursor.rowcount
-    except Exception as e:
-        print(f"Error executing update query: {e}")
-        raise internal_error
+    Executes an update query on the database and commits the transaction.
+    Returns the number of affected rows.
+    """
+    return affect_query(1, query, params)

@@ -1,9 +1,7 @@
 import mariadb
 from fastapi import APIRouter
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
-from services.errors import not_found, access_denied, internal_error
-from services.utils import AuthToken
-from repo import user as user_db
+import services.auth as auth_service
 
 router = APIRouter(tags=["auth"])
 
@@ -14,39 +12,13 @@ async def login(user_data: UserLogin) -> LoginResponse:
     login response containing authentication information. This endpoint is
     responsible for managing user authentication operations.
     """
-
-    username = user_data.username
-    user = user_db.get_user_by_username(username)
-    if user:
-        password = user_data.password
-        if user.password != password:
-            raise access_denied
-        token = AuthToken.generate({"username": username})
-        return LoginResponse(access_token=token, token_type="bearer")
-    else:
-        raise access_denied
+    return auth_service.login_user(user_data)
 
 @router.post("/register", response_model=RegisterResponse)
 async def register(user_data: UserCreate) -> RegisterResponse:
     """
-    Registers a new user in the system.
-
     Handles the creation of a new user by taking user
     details provided and returning a response containing the registration status and other relevant information
     upon successful registration.
     """
-    try:
-        data = UserCreate(username=user_data.username,
-                          password=user_data.password,
-                          email=user_data.email,
-                          birthday=user_data.birthday
-)
-        if not data:
-            print(data)
-            raise internal_error
-        else:
-            created_id = user_db.insert_user(data)
-            return RegisterResponse(message=f"User {created_id} created successfully")
-
-    except Exception as e:
-        raise internal_error
+    return auth_service.register_user(user_data)
