@@ -12,7 +12,7 @@ def login_user(user_data: UserLogin):
         password = user_data.password
         if user.password != password:
             raise access_denied
-        token = AuthToken.generate({"username": username})
+        token = AuthToken.generate({"sub": username})
         return LoginResponse(access_token=token, token_type="bearer")
     else:
         raise access_denied

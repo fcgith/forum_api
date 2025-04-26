@@ -1,6 +1,8 @@
+from typing import List
+
 from models.auth_model import UserCreate
 from models.user import User
-from services.errors import not_found
+from services.errors import not_found, internal_error
 from .connection import read_query, insert_query
 
 def gen_user(result: tuple):
@@ -16,6 +18,15 @@ def gen_user(result: tuple):
         admin=result[6],
         creation_date=result[7]
     )
+
+def get_all_users() -> List[User] | None:
+    try:
+        query = "SELECT * FROM users"
+        result = read_query(query)
+        users = [gen_user(row) for row in result]
+        return users
+    except Exception as e:
+        print(e)
 
 def get_user_by_id(user_id: int) -> User | None:
     try:
