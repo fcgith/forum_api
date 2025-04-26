@@ -21,7 +21,7 @@ class AuthToken:
         encode_data = data.copy()
 
         # set expiry time for the authentication token
-        encode_data['exp'] = datetime.now() + timedelta(minutes=60*8) # 8 hours
+        encode_data['exp'] = (datetime.now() + timedelta(minutes=60*8)).timestamp() # 8 hours
 
         #return encoded JWT token
         return jwt.encode(encode_data, cls.SECRET_KEY, algorithm=cls.ALGORITHM)
@@ -47,7 +47,7 @@ class AuthToken:
             decoded = cls.decode(token)
             exp = decoded.get('exp')
             if exp:
-                if datetime.now() < exp:
+                if datetime.now().timestamp() < exp:
                     return True
             return False
         except jwt.ExpiredSignatureError:
