@@ -13,9 +13,8 @@ class User(BaseModel):
     admin: int = 0
     creation_date: date
 
-    @property
     def is_admin(self):
-        return bool(self.admin)
+        return self.admin > 0
 
 class GetUsers(BaseModel):
     username: str

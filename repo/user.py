@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 
 from models.auth_model import UserCreate
@@ -24,6 +25,7 @@ def get_all_users() -> List[User] | None:
         query = "SELECT * FROM users"
         result = read_query(query)
         users = [gen_user(row) for row in result]
+        print(result[0])
         return users
     except Exception as e:
         print(e)

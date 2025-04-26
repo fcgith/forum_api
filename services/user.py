@@ -15,10 +15,11 @@ def get_user(user_id: int):
 def get_users(username: str, token: str):
     user = get_user_by_username(username)
     if not user:
+        print("not user")
         raise access_denied
 
     decoded_token = AuthToken.decode(token)
-    if decoded_token.get("sub") != user.username or not user.is_admin:
+    if decoded_token.get("sub") != user.username or not user.is_admin():
         raise access_denied
-    else:
-        return get_all_users()
+
+    return get_all_users()

@@ -1,10 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator, field_validator
+
 
 class UserCreate(BaseModel):
     username: str
     password: str
     email: str
-    birthday: int
+    birthday: str
 
 class UserLogin(BaseModel):
     username: str
