@@ -35,3 +35,22 @@ class AuthToken:
         """
 
         return jwt.decode(token, cls.SECRET_KEY, algorithms=[cls.ALGORITHM])
+
+    @classmethod
+    def validate(cls, token: str):
+        """
+        Decodes and validates if an authentication token is valid
+        :param token: str token
+        :return: bool valid or not
+        """
+        try:
+            decoded = cls.decode(token)
+            exp = decoded.get('exp')
+            if exp:
+                if datetime.now() < exp:
+                    return True
+            return False
+        except jwt.ExpiredSignatureError:
+            return False
+        except jwt.InvalidTokenError:
+            return False

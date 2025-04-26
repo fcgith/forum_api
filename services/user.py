@@ -18,6 +18,9 @@ def get_users(username: str, token: str):
         print("not user")
         raise access_denied
 
+    if not AuthToken.validate(token):
+        raise access_denied
+
     decoded_token = AuthToken.decode(token)
     if decoded_token.get("sub") != user.username or not user.is_admin():
         raise access_denied
