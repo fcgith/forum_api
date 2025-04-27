@@ -151,12 +151,19 @@ CREATE TABLE IF NOT EXISTS `forum`.`votes` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `type` TINYINT NOT NULL,
   `reply_id` INT NOT NULL,
-  PRIMARY KEY (`id`, `reply_id`),
+  `user_id` INT NOT NULL,
+  PRIMARY KEY (`id`, `reply_id`, `user_id`),
   INDEX `fk_votes_replies1_idx` (`reply_id` ASC) VISIBLE,
+  INDEX `fk_votes_users1_idx` (`user_id` ASC) VISIBLE,
   CONSTRAINT `fk_votes_replies1`
     FOREIGN KEY (`reply_id`)
     REFERENCES `forum`.`replies` (`id`)
     ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_votes_users1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `forum`.`users` (`id`)
+    ON DELETE CASCADE
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
