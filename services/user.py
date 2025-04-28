@@ -13,17 +13,10 @@ class UserService:
             raise not_found
 
     @classmethod
-    def get_users(cls, username: str, token: str):
-        user = get_user_by_username(username)
-        if not user:
-            print("not user")
-            raise access_denied
+    def get_users(cls, token: str):
+        user = AuthToken.validate(token)
 
-        if not AuthToken.validate(token):
-            raise access_denied
-
-        decoded_token = AuthToken.decode(token)
-        if decoded_token.get("sub") != user.username or not user.is_admin():
+        if not user or not user.is_admin():
             raise access_denied
 
         return get_all_users()
