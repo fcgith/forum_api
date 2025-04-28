@@ -1,68 +1,78 @@
 from contextlib import contextmanager
-
+from typing import Any, Generator, List, Tuple
 import mariadb
 from fastapi import Depends
-from mariadb import Cursor, Connection
+from mariadb import Connection, ConnectionPool
 
-def get_db() -> Connection | None:
+pool = ConnectionPool(
+    pool_name="forum_pool",
+    pool_size=5,
+    host="172.245.56.116",
+    port=3600,
+    user="root",
+    password="root",
+    database="forum"
+)
+
+def get_db() -> Connection:
     """
-    Establish a connection to the MariaDB database and ensure it closes after use.
-    :yield: Active database connection object.
+    Provides a database connection from the connection pool.
+    Note: Connection should be closed by the caller or managed via context.
     """
     conn = None
     try:
-        conn = mariadb.connect(
-            host="172.245.56.116",
-            port=3600,
-            user="root",
-            password="root",
-            database="forum"
-        )
+        conn = pool.get_connection()
         return conn
     except mariadb.Error as e:
-        print(f"Error connecting to MariaDB: {e}")
+        print(f"Error connecting to MariaDB database: {e}")
         raise
+    finally:
+        if conn:
+            conn.close()
 
-def read_query(query, params=(), db = Depends(get_db)):
+def read_query(query: str, params: () = ()) -> List[Tuple] | None:
     """
-    Executes a SQL query against the provided database connection and returns the
-    fetched results or None if no data is found.
+    Executes a SQL query against the provided database connection.
+    Returns the fetched results as a list of tuples or None if an error occurs.
     """
-    try:
-        db = get_db()
-        if db:
+    with get_db() as db:
+        cursor = None
+        try:
             cursor = db.cursor()
             cursor.execute(query, params)
-            return cursor
-    except mariadb.Error as e:
-        print(f"Error executing query: {e}")
-        raise
+            return list(cursor)
+        except Exception as e:
+            print(f"Error executing read query: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
 
-def insert_query(query, params=()) -> id:
-    """
-    Executes an insert SQL query and commits the transaction to the database. Returns the
-    ID of the inserted row.
-    """
-    try:
-        db = get_db()
-        if db:
+def affect_query(qtype: int, query: str, params: ()) -> int | None:
+    with get_db() as db:
+        cursor = None
+        try:
             cursor = db.cursor()
             cursor.execute(query, params)
             db.commit()
-            return cursor.lastrowid
-    except mariadb.Error as e:
-        print(f"Error executing query: {e}")
-        raise
+            return cursor.lastrowid if qtype == 0 else cursor.rowcount
+        except Exception as e:
+            print(f"Error executing query: {e}")
+            return None
+        finally:
+            if cursor:
+                cursor.close()
 
-def update_query(query, params=(), db = Depends(get_db)) -> int:
+def insert_query(query: str, params: () = ()) -> int | None:
     """
-    Executes an update query on the database with given parameters and commits the transaction.
+    Executes an insert SQL query and commits the transaction to the database.
+    Returns the ID of the inserted row.
+    """
+    return affect_query(0, query, params)
 
-    The function takes a SQL query string, optional parameters to be bound to the query,
-    and a database connection object. It executes the query and commits the changes to
-    the database. The function then returns the number of rows affected by the query.
+def update_query(query: str, params: () = ()) -> int | None:
     """
-    cursor = db.cursor()
-    cursor.execute(query, params)
-    db.commit()
-    return cursor.rowcount
+    Executes an update query on the database and commits the transaction.
+    Returns the number of affected rows.
+    """
+    return affect_query(1, query, params)

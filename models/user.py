@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from datetime import datetime, date
 
-from ..repo.user import get_user_by_username
+from pydantic import BaseModel
 
 
 class User(BaseModel):
@@ -8,12 +8,14 @@ class User(BaseModel):
     username: str
     password: str
     email: str
-    birthday: int
-    nickname: str | None = None
-    admin: bool = False
+    birthday: date
     avatar: str | None = None
-    creation_date: str | None = None
+    admin: int = 0
+    creation_date: date
 
     def is_admin(self):
-        return self.role == 'admin'
+        return self.admin > 0
 
+class GetUsers(BaseModel):
+    username: str
+    token: str
