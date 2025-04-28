@@ -1,9 +1,7 @@
-from datetime import datetime
 from typing import List
 
 from models.auth_model import UserCreate
 from models.user import User
-from services.errors import not_found, internal_error
 from .connection import read_query, insert_query
 
 def gen_user(result: tuple):
@@ -21,45 +19,32 @@ def gen_user(result: tuple):
     )
 
 def get_all_users() -> List[User] | None:
-    try:
-        query = "SELECT * FROM users"
-        result = read_query(query)
-        users = [gen_user(row) for row in result]
-        print(result[0])
-        return users
-    except Exception as e:
-        print(e)
+    query = "SELECT * FROM users"
+    result = read_query(query)
+    users = [gen_user(row) for row in result]
+    return users
 
 def get_user_by_id(user_id: int) -> User | None:
-    try:
-        query = "SELECT * FROM users WHERE id = ?"
-        result = read_query(query, (user_id,))
-        if result:
-            return gen_user(result[0])
-        else:
-            return None
-    except Exception as e:
-        print(e)
+    query = "SELECT * FROM users WHERE id = ?"
+    result = read_query(query, (user_id,))
+    if result:
+        return gen_user(result[0])
+    else:
+        return None
 
 def get_user_by_username(username: str) -> User | None:
-    try:
-        query = "SELECT * FROM users WHERE username = ?"
-        result = read_query(query, (username,))
-        if result:
-            return gen_user(result[0])
-        else:
-            return None
-    except Exception as e:
-        print(e)
+    query = "SELECT * FROM users WHERE username = ?"
+    result = read_query(query, (username,))
+    if result:
+        return gen_user(result[0])
+    else:
+        return None
 
 def insert_user(data: UserCreate) -> int | None:
-    try:
-        query = "INSERT INTO users (username, password, email, birthday) VALUES (?, ?, ?, ?)"
-        result = insert_query(query,
-                                (data.username,
-                                        data.password,
-                                        data.email,
-                                        data.birthday))
-        return result
-    except Exception as e:
-        print(e)
+    query = "INSERT INTO users (username, password, email, birthday) VALUES (?, ?, ?, ?)"
+    result = insert_query(query,
+                            (data.username,
+                                    data.password,
+                                    data.email,
+                                    data.birthday))
+    return result

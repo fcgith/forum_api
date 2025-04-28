@@ -1,7 +1,7 @@
 import mariadb
 from fastapi import APIRouter
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
-import services.auth as auth_service
+from services.auth import AuthService
 
 router = APIRouter(tags=["auth"])
 
@@ -12,7 +12,7 @@ async def login(user_data: UserLogin) -> LoginResponse:
     login response containing authentication information. This endpoint is
     responsible for managing user authentication operations.
     """
-    return auth_service.login_user(user_data)
+    return AuthService.login_user(user_data)
 
 @router.post("/register", response_model=RegisterResponse)
 async def register(user_data: UserCreate) -> RegisterResponse:
@@ -22,4 +22,4 @@ async def register(user_data: UserCreate) -> RegisterResponse:
     upon successful registration.
     """
     print("here1")
-    return auth_service.register_user(user_data)
+    return AuthService.register_user(user_data)
