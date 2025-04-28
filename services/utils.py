@@ -2,6 +2,8 @@
 from datetime import datetime, timedelta
 import jwt
 
+from repo.user import get_user_by_username
+from services.errors import access_denied
 
 
 class AuthToken:
@@ -48,7 +50,10 @@ class AuthToken:
             exp = decoded.get('exp')
             if exp:
                 if datetime.now().timestamp() < exp:
-                    return True
+                    user = get_user_by_username(decoded.get('sub'))
+                    if not user:
+                        raise access_denied
+                    return user
             return False
         except jwt.ExpiredSignatureError:
             return False
