@@ -17,14 +17,14 @@ def get_all_conversations() -> List[Conversation] | None:
     if result:
         conversations = [gen_conversation(row) for row in result]
         return conversations
-    return None
+    return []
 
 def get_conversation_by_id(conversation_id: int) -> Conversation | None:
     query = "SELECT * FROM conversations WHERE id = ?"
     result = read_query(query, (conversation_id,))
     if result:
         return gen_conversation(result[0])
-    return None
+    return []
 
 def get_conversations_by_user(user_id: int) -> List[Conversation] | None:
     query = "SELECT * FROM conversations WHERE initiator_id = ? OR receiver_id = ?"
@@ -32,7 +32,7 @@ def get_conversations_by_user(user_id: int) -> List[Conversation] | None:
     if result:
         conversations = [gen_conversation(row) for row in result]
         return conversations
-    return None
+    return []
 
 def create_conversation(data: ConversationCreate) -> int | None:
     query = "INSERT INTO conversations (initiator_id, receiver_id) VALUES (?, ?)"
