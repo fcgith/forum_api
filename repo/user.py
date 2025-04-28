@@ -2,7 +2,7 @@ from typing import List
 
 from models.auth_model import UserCreate
 from models.user import User
-from .connection import read_query, insert_query
+from data.connection import read_query, insert_query
 
 def gen_user(result: tuple):
     # print(result)
