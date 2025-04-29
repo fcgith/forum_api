@@ -6,7 +6,6 @@ class Category(BaseModel):
     id: int
     name: str
     description: str | None = None
-    creation_date: datetime
 
 
 class CategoryCreate(BaseModel):

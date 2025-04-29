@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 from pydantic import BaseModel
 
 
@@ -6,7 +6,7 @@ class Topic(BaseModel):
     id: int
     name: str
     content: str
-    date: datetime
+    date: date
     category_id: int
     user_id: int
 
