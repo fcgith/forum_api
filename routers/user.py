@@ -1,6 +1,6 @@
 from typing import List
 from fastapi import APIRouter
-from models.user import User
+from models.user import User, UserPublic
 from services.user import UserService
 
 router = APIRouter(tags=["user"])
@@ -18,8 +18,8 @@ async def get_all_users(token: str) -> List[User]:
     users = UserService.get_users(token)
     return users
 
-@router.get("/{user_id}", response_model=User)
-async def get_user_with_id(user_id: int) -> User:
+@router.get("/{user_id}")
+async def get_user_with_id(user_id: int) -> User | UserPublic:
     """
     Retrieve a user by their ID number.
 

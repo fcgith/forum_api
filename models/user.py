@@ -1,6 +1,6 @@
 from datetime import datetime, date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class User(BaseModel):

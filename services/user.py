@@ -9,7 +9,7 @@ class UserService:
 
     @classmethod
     def get_user(cls, user_id: int) -> User | None:
-        user = get_user_by_id(user_id)
+        user = get_user_by_id(user_id, true)
         if user:
             return user
         else:

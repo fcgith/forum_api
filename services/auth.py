@@ -26,11 +26,11 @@ class AuthService:
                               birthday=user_data.birthday
                               )
             if not data:
-                print(data)
                 raise internal_error
             else:
                 created_id = user_db.insert_user(data)
                 return RegisterResponse(message=f"User {created_id} created successfully")
 
         except Exception as e:
+            print(e)
             raise internal_error
