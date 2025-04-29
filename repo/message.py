@@ -9,7 +9,8 @@ def gen_message(result: tuple) -> Message:
         content=result[1],
         date=result[2],
         conversation_id=result[3],
-        sender_id=result[4]
+        sender_id=result[4],
+        receiver_id=result[5]
     )
 
 def get_messages_by_conversation(conversation_id: int) -> List[Message] | None:
@@ -27,7 +28,7 @@ def get_message_by_id(message_id: int) -> Message | None:
         return gen_message(result[0])
     return None
 
-def create_message(data: MessageCreate) -> int | None:
-    query = "INSERT INTO messages (content, conversation_id, sender_id) VALUES (?, ?, ?)"
-    result = insert_query(query, (data.content, data.conversation_id, data.sender_id))
+def create_message(data: MessageCreate, conversation_id: int,sender_id:int) -> int | None:
+    query = "INSERT INTO messages (content, conversation_id, sender_id, receiver_id) VALUES (?, ?, ?, ?)"
+    result = insert_query(query, (data.content, conversation_id, sender_id,data.receiver_id))
     return result

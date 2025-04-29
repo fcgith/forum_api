@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 import jwt
 
+from models.user import User, UserPublic
 from repo.user import get_user_by_username
 from services.errors import access_denied
 
@@ -22,7 +23,7 @@ class AuthToken:
         # copy data to just in case
         encode_data = data.copy()
 
-        # set expiry time for the authentication token
+        # set the expiry time for the authentication token
         encode_data['exp'] = (datetime.now() + timedelta(minutes=60*8)).timestamp() # 8 hours
 
         #return encoded JWT token
@@ -39,21 +40,35 @@ class AuthToken:
         return jwt.decode(token, cls.SECRET_KEY, algorithms=[cls.ALGORITHM])
 
     @classmethod
-    def validate(cls, token: str):
+    def validate(cls, token: str, public: bool = False) -> User | UserPublic | bool:
         """
         Decodes and validates if an authentication token is valid
         :param token: str token
-        :return: bool valid or not
+        :param public: bool if public data should be shared in response
+        :return: bool is token valid or not
         """
+        valid_date = cls.validate_expiry(token)
+        if valid_date:
+            try:
+                username = cls.decode(token).get("sub")
+                user = get_user_by_username(username, public)
+                if not user:
+                    raise access_denied
+                return user
+            except jwt.ExpiredSignatureError:
+                return False
+            except jwt.InvalidTokenError:
+                return False
+        else:
+            return False
+
+    @classmethod
+    def validate_expiry(cls, token: str) -> bool:
         try:
             decoded = cls.decode(token)
             exp = decoded.get('exp')
-            if exp:
-                if datetime.now().timestamp() < exp:
-                    user = get_user_by_username(decoded.get('sub'))
-                    if not user:
-                        raise access_denied
-                    return user
+            if datetime.now().timestamp() < exp:
+                return True
             return False
         except jwt.ExpiredSignatureError:
             return False

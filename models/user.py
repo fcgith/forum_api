@@ -1,6 +1,6 @@
 from datetime import datetime, date
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 
 
 class User(BaseModel):
@@ -16,6 +16,8 @@ class User(BaseModel):
     def is_admin(self):
         return self.admin > 0
 
-class GetUsers(BaseModel):
+class UserPublic(BaseModel):
+    id: int | None
     username: str
-    token: str
+    avatar: str | None = None
+    creation_date: date

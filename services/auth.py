@@ -1,36 +1,37 @@
 import repo.user as user_db
 from models.auth_model import LoginResponse, UserLogin, UserCreate, RegisterResponse
-from services.errors import access_denied, internal_error
+from services.errors import access_denied, internal_error, registration_user_exists, invalid_credentials
 from services.utils import AuthToken
 
 class AuthService:
     @classmethod
-    def login_user(cls, user_data: UserLogin):
+    def login_user(cls, user_data: UserLogin) -> LoginResponse | None:
         username = user_data.username
         user = user_db.get_user_by_username(username)
         if user:
-            password = user_data.password
-            if user.password != password:
-                raise access_denied
-            token = AuthToken.generate({"sub": username})
-            return LoginResponse(access_token=token, token_type="bearer")
-        else:
-            raise access_denied
+            if user.password == user_data.password:
+                token = AuthToken.generate({"sub": username})
+                return LoginResponse(access_token=token, token_type="bearer")
+        raise invalid_credentials
 
     @classmethod
-    def register_user(cls, user_data: UserCreate):
-        try:
-            data = UserCreate(username=user_data.username,
-                              password=user_data.password,
-                              email=user_data.email,
-                              birthday=user_data.birthday
-                              )
-            if not data:
-                print(data)
-                raise internal_error
-            else:
-                created_id = user_db.insert_user(data)
-                return RegisterResponse(message=f"User {created_id} created successfully")
+    def register_user(cls, user_data: UserCreate) -> RegisterResponse:
+        data = UserCreate(username=user_data.username,
+                          password=user_data.password,
+                          email=user_data.email,
+                          birthday=user_data.birthday
+                          )
 
-        except Exception as e:
-            raise internal_error
+        if user_db.user_exists((user_data.username, user_data.email)):
+            raise registration_user_exists
+
+        created_id = user_db.insert_user(data)
+        return RegisterResponse(message=f"User {created_id} created successfully")
+
+    @classmethod
+    def decode_token_username(cls, token) -> dict:
+        if AuthToken.validate_expiry(token):
+            data = AuthToken.decode(token)
+            if data:
+                return {"username": data["sub"]}
+        return {"error": "Invalid token"}
