@@ -29,7 +29,10 @@ class AuthService:
                 raise internal_error
             else:
                 created_id = user_db.insert_user(data)
-                return RegisterResponse(message=f"User {created_id} created successfully")
+                if created_id:
+                    return RegisterResponse(message=f"User {created_id} created successfully")
+                else:
+                    raise internal_error
 
         except Exception as e:
             print(e)
