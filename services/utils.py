@@ -23,7 +23,7 @@ class AuthToken:
         # copy data to just in case
         encode_data = data.copy()
 
-        # set expiry time for the authentication token
+        # set the expiry time for the authentication token
         encode_data['exp'] = (datetime.now() + timedelta(minutes=60*8)).timestamp() # 8 hours
 
         #return encoded JWT token
