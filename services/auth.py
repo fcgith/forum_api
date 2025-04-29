@@ -38,7 +38,7 @@ class AuthService:
             raise internal_error
 
     @classmethod
-    def decode_token_username(cls, token):
+    def decode_token_username(cls, token) -> dict:
         if AuthToken.validate_expiry(token):
             data = AuthToken.decode(token)
             if data:
