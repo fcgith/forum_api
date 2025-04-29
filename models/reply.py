@@ -1,12 +1,11 @@
-from datetime import datetime
+from datetime import date
 from pydantic import BaseModel
-
 
 
 class Reply(BaseModel):
     id: int
     content: str
-    date: datetime
+    date: date
     topic_id: int
     user_id: int
 
