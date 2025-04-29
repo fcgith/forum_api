@@ -5,8 +5,6 @@ from models.user import User, UserPublic
 from data.connection import read_query, insert_query
 
 def gen_user(result: tuple, public: bool = False) -> User | UserPublic:
-    # print(result)
-    # raise Exception("test")
     return User(
         id=result[0],
         username=result[1],
@@ -19,7 +17,6 @@ def gen_user(result: tuple, public: bool = False) -> User | UserPublic:
     ) if not public else UserPublic(
         id=result[0],
         username=result[1],
-        email=result[3],
         avatar=result[5],
         creation_date=result[7]
     )
@@ -76,9 +73,9 @@ def insert_user(data: UserCreate) -> int | None:
                                     data.birthday))
     return result
 
-def gen_users_in_list_by_id(lst: List[int], public: bool = False) -> List[User]:
+def gen_users_in_list_by_id(lst: List[int], public: bool = False) -> List[User] | List[UserPublic]:
     """
-    Converts a list of IDs into a list of Users
+    Converts a list of IDs into a list of User or UserPublic
     :param lst: List of user IDs
     :param public: bool should private data be exposed
     :return: List of User or UserPublic objects

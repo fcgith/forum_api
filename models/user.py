@@ -19,6 +19,5 @@ class User(BaseModel):
 class UserPublic(BaseModel):
     id: int | None
     username: str
-    email: str
     avatar: str | None = None
     creation_date: date

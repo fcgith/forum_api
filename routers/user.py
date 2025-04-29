@@ -28,4 +28,4 @@ async def get_user_with_id(user_id: int) -> User | UserPublic:
     :return: The user object containing detailed information about the user.
     :rtype: User
     """
-    return UserService.get_user(user_id)
+    return UserService.get_user(user_id, True)
