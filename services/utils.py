@@ -2,6 +2,7 @@
 from datetime import datetime, timedelta
 import jwt
 
+from models.user import User
 from repo.user import get_user_by_username
 from services.errors import access_denied
 
@@ -39,7 +40,7 @@ class AuthToken:
         return jwt.decode(token, cls.SECRET_KEY, algorithms=[cls.ALGORITHM])
 
     @classmethod
-    def validate(cls, token: str):
+    def validate(cls, token: str) -> User | bool:
         """
         Decodes and validates if an authentication token is valid
         :param token: str token
