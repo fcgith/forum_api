@@ -36,7 +36,7 @@ def get_user_by_id(user_id: int, public: bool = False) -> User | None:
     Returns User if such exists by id or UserPublic if such is requested via service
     :param user_id: int user id
     :param public: bool should private data be exposed
-    :return: User or None
+    :return: User, UserPublic or None
     """
     query = "SELECT * FROM users WHERE id = ?"
     result = read_query(query, (user_id,))
@@ -50,7 +50,7 @@ def get_user_by_username(username: str, public: bool = False) -> User | None:
     Returns User if such exists by username or UserPublic if such is requested via service
     :param username: str Username
     :param public: bool should private data be exposed
-    :return: User or None
+    :return: User, UserPublic or None
     """
     query = "SELECT * FROM users WHERE username = ?"
     result = read_query(query, (username,))
@@ -58,6 +58,32 @@ def get_user_by_username(username: str, public: bool = False) -> User | None:
         return gen_user(result[0], public)
     else:
         return None
+
+def get_user_by_email(email: str, public: bool = False) -> User | None:
+    """
+    Returns User if such exists by email or UserPublic if such is requested via service
+    :param email: str Email
+    :param public: bool should private data be exposed
+    :return: User, UserPublic or None
+    """
+    query = "SELECT * FROM users WHERE email = ?"
+    result = read_query(query, (email,))
+    if result:
+        return gen_user(result[0], public)
+    else:
+        return None
+
+def user_exists(data: ()) -> bool:
+    """
+    Determines if a user exists in the database based on the provided
+    username or email.
+
+    :param data: tuple containing username and email
+    :return: bool indicating if the user exists in the database
+    """
+    query = "SELECT * FROM users WHERE username = ? OR email = ?"
+    result = read_query(query, data)
+    return True if result else False
 
 def insert_user(data: UserCreate) -> int | None:
     """

@@ -8,8 +8,6 @@ internal_error = HTTPException(status_code=500, detail="Internal error")
 
 
 #auth errors
-invalid_username = HTTPException(status_code=401, detail="Invalid username")
-invalid_password = HTTPException(status_code=401, detail="Invalid password")
+invalid_credentials = HTTPException(status_code=403, detail="Invalid credentials")
 invalid_token = HTTPException(status_code=401, detail="Invalid token")
-registration_username_exists = HTTPException(status_code=401, detail="Registration error: username already exists")
-registration_email_exists = HTTPException(status_code=401, detail="Registration error: email already exists")
+registration_user_exists = HTTPException(status_code=401, detail="Registration error: User with this username or email already exists")
