@@ -35,10 +35,11 @@ class ConversationsService:
     @classmethod
     def send_message(cls, receiver_id: int, content: str, token: str):
         """
-        Send a message to an existing conversation
+        Send a message to an existing conversation or start a new conversation if none exists yet.
 
         Args:
             content: Text content of the message
+            receiver_id: ID of the user to whom the message is being sent
             token: Authentication token
 
         Returns:
@@ -48,9 +49,7 @@ class ConversationsService:
         if not user:
             raise invalid_token
         receiver_user = user_repo.get_user_by_id(receiver_id)
-        if not receiver_user:
-            raise invalid_credentials
-        if receiver_id==user.id:
+        if not receiver_user or receiver_id==user.id:
             raise invalid_credentials
         if not conversation_exists(user.id, receiver_id):
             conversation_id = create_conversation(user.id, receiver_id)
@@ -64,7 +63,7 @@ class ConversationsService:
         )
 
         message_id = create_message(message_data,conversation_id,user.id)
-        return {"message_id": message_id, "status": "Message sent successfully"}
+        return {"message_id": message_id, "message": "Message sent successfully"}
 
 
     @classmethod
