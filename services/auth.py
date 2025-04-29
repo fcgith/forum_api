@@ -5,7 +5,7 @@ from services.utils import AuthToken
 
 class AuthService:
     @classmethod
-    def login_user(cls, user_data: UserLogin):
+    def login_user(cls, user_data: UserLogin) -> LoginResponse | None:
         username = user_data.username
         user = user_db.get_user_by_username(username)
         if user:
@@ -18,7 +18,7 @@ class AuthService:
             raise access_denied
 
     @classmethod
-    def register_user(cls, user_data: UserCreate):
+    def register_user(cls, user_data: UserCreate) -> RegisterResponse:
         try:
             data = UserCreate(username=user_data.username,
                               password=user_data.password,

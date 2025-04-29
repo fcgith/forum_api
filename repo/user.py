@@ -4,7 +4,7 @@ from models.auth_model import UserCreate
 from models.user import User
 from data.connection import read_query, insert_query
 
-def gen_user(result: tuple):
+def gen_user(result: tuple) -> User:
     # print(result)
     # raise Exception("test")
     return User(
@@ -48,3 +48,6 @@ def insert_user(data: UserCreate) -> int | None:
                                     data.email,
                                     data.birthday))
     return result
+
+def gen_users_in_list_by_id(lst: List[int]) -> List[User]:
+    return [get_user_by_id(user_id) for user_id in lst]
