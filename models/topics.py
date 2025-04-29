@@ -18,4 +18,4 @@ class TopicCreate(BaseModel):
 
 
 class TopicResponse(Topic):
-    pass
+    content: str
