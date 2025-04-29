@@ -36,3 +36,7 @@ class AuthService:
         except Exception as e:
             print(e)
             raise internal_error
+
+    @classmethod
+    def validate(cls, token):
+        return AuthToken.validate(token)
