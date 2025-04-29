@@ -1,12 +1,11 @@
-from pydantic import BaseModel
-from typing import Union, Literal
+from pydantic import BaseModel, validator, field_validator
+
 
 class UserCreate(BaseModel):
     username: str
     password: str
     email: str
-    birthday: int
-    nickname: str | None = None
+    birthday: str
 
 class UserLogin(BaseModel):
     username: str
