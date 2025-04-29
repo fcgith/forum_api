@@ -99,7 +99,7 @@ def insert_user(data: UserCreate) -> int | None:
                                     data.birthday))
     return result
 
-def gen_users_in_list_by_id(lst: List[int], public: bool = False) -> List[User] | List[UserPublic]:
+def get_users_in_list_by_id(lst: List[int], public: bool = False) -> List[User] | List[UserPublic]:
     """
     Converts a list of IDs into a list of User or UserPublic
     :param lst: List of user IDs

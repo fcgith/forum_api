@@ -11,3 +11,6 @@ internal_error = HTTPException(status_code=500, detail="Internal error")
 invalid_credentials = HTTPException(status_code=403, detail="Invalid credentials")
 invalid_token = HTTPException(status_code=401, detail="Invalid token")
 registration_user_exists = HTTPException(status_code=401, detail="Registration error: User with this username or email already exists")
+
+#conversation errors
+conversation_not_found = HTTPException(status_code=402, detail="Conversation not found")
