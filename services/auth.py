@@ -36,3 +36,11 @@ class AuthService:
         except Exception as e:
             print(e)
             raise internal_error
+
+    @classmethod
+    def decode_token_username(cls, token) -> dict:
+        if AuthToken.validate_expiry(token):
+            data = AuthToken.decode(token)
+            if data:
+                return {"username": data["sub"]}
+        return {"error": "Invalid token"}

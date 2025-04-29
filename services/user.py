@@ -1,6 +1,6 @@
 from typing import List
 
-from models.user import User
+from models.user import User, UserPublic
 from repo.user import get_user_by_id, get_user_by_username, get_all_users
 from services.errors import access_denied, not_found
 from services.utils import AuthToken
@@ -8,7 +8,7 @@ from services.utils import AuthToken
 class UserService:
 
     @classmethod
-    def get_user(cls, user_id: int, public: bool = False) -> User | None:
+    def get_user(cls, user_id: int, public: bool = False) -> User | UserPublic | None:
         user = get_user_by_id(user_id, public)
         if user:
             return user

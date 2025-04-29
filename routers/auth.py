@@ -22,3 +22,13 @@ async def register(user_data: UserCreate) -> RegisterResponse:
     upon successful registration.
     """
     return AuthService.register_user(user_data)
+
+@router.get("/")
+async def get_username_by_token(token: str) -> dict:
+    """
+    Retrieve a username by decoding the provided token.
+
+    :param token: A JWT token.
+    :return: The username associated with the token.
+    """
+    return AuthService.decode_token_username(token)
