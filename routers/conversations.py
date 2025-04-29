@@ -23,11 +23,10 @@ async def get_all_conversations(token: str)-> List[UserPublic]:
 @router.post("/messages")
 async def send_message(message: MessageCreate, token: str):
     """
-    Create a new message in an existing conversation
+    Create a new message in an existing conversation or start a new conversation if none exists yet.
 
     - Requires authentication via token
     - Message must contain text content
-    - User must be part of the conversation
     """
     return ConversationsService.send_message(message.receiver_id, message.content, token)
 
