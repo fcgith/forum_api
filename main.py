@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
@@ -18,11 +20,11 @@ app.include_router(conversation_router, prefix="/conversations")
 # Handle Pydantic exception validation error for frontend
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc: RequestValidationError):
-    first_error = exc.errors()[0]["msg"].replace("Value error,", "Invalid data:")
+    errors: List[str] = [error["msg"].replace("Value error,", "Invalid data:") for error in exc.errors()]
     return JSONResponse\
     (
         status_code=HTTP_400_BAD_REQUEST,
-        content={"detail": first_error}
+        content={"detail": "<br />".join(errors)}
     )
 
 
