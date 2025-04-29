@@ -18,8 +18,8 @@ async def get_all_users(token: str) -> List[User]:
     users = UserService.get_users(token)
     return users
 
-@router.get("/{user_id}", response_model=User)
-async def get_user_with_id(user_id: int) -> User | UserPublic:
+@router.get("/{user_id}")
+async def get_user_with_id(user_id: int) -> UserPublic:
     """
     Retrieve a user by their ID number.
 
