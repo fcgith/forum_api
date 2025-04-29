@@ -21,5 +21,4 @@ async def register(user_data: UserCreate) -> RegisterResponse:
     details provided and returning a response containing the registration status and other relevant information
     upon successful registration.
     """
-    print("here1")
     return AuthService.register_user(user_data)

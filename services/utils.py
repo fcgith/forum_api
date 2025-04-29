@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 import jwt
 
-from models.user import User
+from models.user import User, UserPublic
 from repo.user import get_user_by_username
 from services.errors import access_denied
 
@@ -40,18 +40,19 @@ class AuthToken:
         return jwt.decode(token, cls.SECRET_KEY, algorithms=[cls.ALGORITHM])
 
     @classmethod
-    def validate(cls, token: str) -> User | bool:
+    def validate(cls, token: str, public: bool = False) -> User | UserPublic | bool:
         """
         Decodes and validates if an authentication token is valid
         :param token: str token
-        :return: bool valid or not
+        :param public: bool if public data should be shared in response
+        :return: bool is token valid or not
         """
         try:
             decoded = cls.decode(token)
             exp = decoded.get('exp')
             if exp:
                 if datetime.now().timestamp() < exp:
-                    user = get_user_by_username(decoded.get('sub'))
+                    user = get_user_by_username(decoded.get('sub'), public)
                     if not user:
                         raise access_denied
                     return user

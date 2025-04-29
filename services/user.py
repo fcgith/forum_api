@@ -8,16 +8,16 @@ from services.utils import AuthToken
 class UserService:
 
     @classmethod
-    def get_user(cls, user_id: int) -> User | None:
-        user = get_user_by_id(user_id)
+    def get_user(cls, user_id: int, public: bool = False) -> User | None:
+        user = get_user_by_id(user_id, public)
         if user:
             return user
         else:
             raise not_found
 
     @classmethod
-    def get_users(cls, token: str) -> List[User]:
-        user = AuthToken.validate(token)
+    def get_users(cls, token: str, public: bool = False) -> List[User]:
+        user = AuthToken.validate(token, public)
 
         if not user or not user.is_admin():
             raise access_denied

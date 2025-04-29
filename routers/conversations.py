@@ -1,5 +1,8 @@
+from typing import List
+
 from fastapi import APIRouter
 from models.message import MessageRequest, NewConversationRequest
+from models.user import UserPublic
 from services.conversations import ConversationsService
 
 router = APIRouter(tags=["conversations"])

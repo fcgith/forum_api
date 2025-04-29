@@ -9,8 +9,7 @@ class AuthService:
         username = user_data.username
         user = user_db.get_user_by_username(username)
         if user:
-            password = user_data.password
-            if user.password != password:
+            if user.password != user_data.password:
                 raise access_denied
             token = AuthToken.generate({"sub": username})
             return LoginResponse(access_token=token, token_type="bearer")
@@ -26,11 +25,14 @@ class AuthService:
                               birthday=user_data.birthday
                               )
             if not data:
-                print(data)
                 raise internal_error
             else:
                 created_id = user_db.insert_user(data)
-                return RegisterResponse(message=f"User {created_id} created successfully")
+                if created_id:
+                    return RegisterResponse(message=f"User {created_id} created successfully")
+                else:
+                    raise internal_error
 
         except Exception as e:
+            print(e)
             raise internal_error
