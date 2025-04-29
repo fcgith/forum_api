@@ -25,8 +25,4 @@ async def register(user_data: UserCreate) -> RegisterResponse:
 
 @router.get("/")
 async def get_username_by_token(token: str):
-    user = AuthService.validate(token)
-    if user:
-        return {"username": user.username}
-    else:
-        return {"error": "Invalid token"}
+    return AuthService.decode_token_username(token)

@@ -38,5 +38,9 @@ class AuthService:
             raise internal_error
 
     @classmethod
-    def validate(cls, token):
-        return AuthToken.validate(token)
+    def decode_token_username(cls, token):
+        if AuthToken.validate_expiry(token):
+            data = AuthToken.decode(token)
+            if data:
+                return {"username": data["sub"]}
+        return {"error": "Invalid token"}
