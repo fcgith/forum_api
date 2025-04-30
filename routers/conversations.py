@@ -1,8 +1,5 @@
 from typing import List
-
 from fastapi import APIRouter
-
-from models.conversation import ConversationCreate
 from models.message import MessageCreate
 from models.user import UserPublic
 from services.conversations import ConversationsService
