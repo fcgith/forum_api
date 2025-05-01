@@ -43,6 +43,7 @@ class TopicsService:
 
         Args:
             topic_id: ID of the topic
+            token: Authentication token for user validation.
 
         Returns:
             Topic data
@@ -65,6 +66,7 @@ class TopicsService:
             search (str): Optional search keyword to filter topics by name.
             sort (str): Sorting criteria (e.g., "id DESC", "name ASC").
             page (int): Page number for pagination (0-based index).
+            token: Authentication token for user validation.
 
         Returns:
             List[Topic]: A list of Topic objects if found, otherwise [].
