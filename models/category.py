@@ -1,6 +1,6 @@
-
+from typing import Optional
 from pydantic import BaseModel
-
+from models.category_permission import PermissionTypeEnum
 
 class Category(BaseModel):
     id: int
@@ -15,3 +15,4 @@ class CategoryCreate(BaseModel):
 
 class CategoryResponse(Category):
     content: str
+    user_permission: Optional[PermissionTypeEnum] = None
