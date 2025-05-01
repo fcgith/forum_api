@@ -1,7 +1,7 @@
 # Errors go here
 from fastapi import HTTPException
 
-not_found = HTTPException(status_code=404, detail="Not found")
+not_found = HTTPException(status_code=402, detail="Not found")
 access_denied = HTTPException(status_code=403, detail="Access denied")
 not_implemented = HTTPException(status_code=501, detail="Not implemented")
 internal_error = HTTPException(status_code=500, detail="Internal error")
@@ -14,3 +14,6 @@ registration_user_exists = HTTPException(status_code=401, detail="Registration e
 
 #conversation errors
 conversation_not_found = HTTPException(status_code=402, detail="Conversation not found")
+
+#topic errors
+category_not_found = HTTPException(status_code=402, detail="Category not found")

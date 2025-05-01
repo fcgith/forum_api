@@ -1,0 +1,32 @@
+from fastapi import APIRouter
+
+from models.topic import TopicCreate, TopicResponse
+from services.topics import TopicsService
+
+router = APIRouter(tags=["topics"])
+
+
+@router.post("/")
+async def create_topic(topic: TopicCreate, token: str):
+    """
+    Create a new topic
+
+    - Requires authentication token
+    - Topic data must contain at least a title and a Category
+    """
+    return TopicsService.create_topic(topic, token)
+
+
+@router.get("/{topic_id}")
+async def get_topic(token: str,topic_id: int):
+    """
+    Get a topic by ID
+    """
+    return TopicsService.get_topic(topic_id,token)
+
+@router.get("/")
+async def get_topics(token: str,search:str=None,sort:str=None,page:int=0,):
+    """
+    Get all topics
+    """
+    return TopicsService.get_topics(search,sort,page,token)
