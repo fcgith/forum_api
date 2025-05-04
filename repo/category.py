@@ -2,7 +2,7 @@ from typing import List, Tuple
 from models.category import Category, CategoryCreate
 from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query
-from services.errors import not_found
+from services.errors import not_found, category_not_found
 
 
 def gen_category(result: tuple) -> Category:
@@ -63,7 +63,7 @@ def is_category_viewable(category_id: int, user_id: int) -> bool:
     if result:
         ctype = result[0][0] # 0 for hidden, 1 for viewable
     else:
-        raise not_found # category not found
+        raise category_not_found # category not found
 
     if ctype == 1:
         # hidden category
