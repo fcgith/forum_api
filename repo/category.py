@@ -2,6 +2,8 @@ from typing import List, Tuple
 from models.category import Category, CategoryCreate
 from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query
+from services.errors import not_found
+
 
 def gen_category(result: tuple) -> Category:
     return Category(
@@ -39,29 +41,29 @@ def get_categories_with_permissions(user_id: int) -> List[Tuple[Category, Permis
         categories.append((category, permission))
     return categories
 
-def is_category_viewable(category_id: int, user_id: int) -> bool:
-    query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
+def get_category_permissions(category_id: int, user_id: int) -> int:
+    query = "SELECT type FROM category_permissions WHERE category_id = ? AND user_id = ?"
     result = read_query(query, (category_id, user_id))
 
-    if not result:
-        result = 1
-    elif result[0][1] == 0:
-        return False
+    return 1 if not result else result[0][0] # 1 = Default
+
+def is_category_viewable(category_id: int, user_id: int) -> bool:
+    perm = get_category_permissions(category_id, user_id)
+
+    query = "SELECT hidden FROM categories WHERE id = ?"
+    result = read_query(query, (category_id,))
+
+    if result:
+        ctype = result[0][0] # 0 for hidden, 1 for viewable
     else:
-        result = result[0][1]
-
-    cquery = "SELECT * FROM categories WHERE id = ?"
-    cresult = read_query(cquery, (category_id,))
-    ctype = cresult[0][3] # 0 for hidden, 1 for viewable
-
-
+        raise not_found
 
     if ctype == 1:
         # hidden category
-        return result >= 2
+        return perm >= 2
     elif ctype == 0:
         # public category
-        return result >= 1
+        return perm >= 1
     else:
         return False
 
