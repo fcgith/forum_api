@@ -7,7 +7,8 @@ def gen_category(result: tuple) -> Category:
     return Category(
         id=result[0],
         name=result[1],
-        description=result[2]
+        description=result[2],
+        hidden=result[3]
     )
 
 def get_all_categories() -> List[Category] | None:
@@ -37,3 +38,37 @@ def get_categories_with_permissions(user_id: int) -> List[Tuple[Category, Permis
         permission = PermissionTypeEnum(row[3]) if row[3] is not None else PermissionTypeEnum.NO_PERMISSION
         categories.append((category, permission))
     return categories
+
+def is_category_viewable(category_id: int, user_id: int) -> bool:
+    query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
+    result = read_query(query, (category_id, user_id))
+
+    if not result:
+        result = 1
+    elif result[0][1] == 0:
+        return False
+    else:
+        result = result[0][1]
+
+    cquery = "SELECT * FROM categories WHERE id = ?"
+    cresult = read_query(cquery, (category_id,))
+    ctype = cresult[0][3] # 0 for hidden, 1 for viewable
+
+
+
+    if ctype == 1:
+        # hidden category
+        return result >= 2
+    elif ctype == 0:
+        # public category
+        return result >= 1
+    else:
+        return False
+
+def get_viewable_category_ids(user_id: int) -> List[int]:
+    categories = get_all_categories()
+    viewable_categories = []
+    for category in categories:
+        if is_category_viewable(category.id, user_id):
+            viewable_categories.append(category.id)
+    return viewable_categories
