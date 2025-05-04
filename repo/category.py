@@ -54,13 +54,16 @@ def get_category_permissions(category_id: int, user_id: int) -> int:
 def is_category_viewable(category_id: int, user_id: int) -> bool:
     perm = get_category_permissions(category_id, user_id)
 
+    if perm == 0:
+        return False # no permission at all
+
     query = "SELECT hidden FROM categories WHERE id = ?"
     result = read_query(query, (category_id,))
 
     if result:
         ctype = result[0][0] # 0 for hidden, 1 for viewable
     else:
-        raise not_found
+        raise not_found # category not found
 
     if ctype == 1:
         # hidden category
