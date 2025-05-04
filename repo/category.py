@@ -41,6 +41,10 @@ def get_categories_with_permissions(user_id: int) -> List[Tuple[Category, Permis
         categories.append((category, permission))
     return categories
 
+def get_all_category_ids() -> List[int]:
+    query = "SELECT id FROM categories"
+    return [row[0] for row in read_query(query)]
+
 def get_category_permissions(category_id: int, user_id: int) -> int:
     query = "SELECT type FROM category_permissions WHERE category_id = ? AND user_id = ?"
     result = read_query(query, (category_id, user_id))
