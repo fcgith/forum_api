@@ -33,19 +33,27 @@ def create_topic(data: TopicCreate, user_id: int) -> int | None:
     result = insert_query(query, (data.name, data.content, data.category_id, user_id))
     return result
 
-def get_topics(search: str = None, sort: str = "id DESC", page: int = 0) -> List[Topic]:
-    query = "SELECT * FROM topics"
-    params = []
+def get_topics(search: str = None, sort: str = "id DESC", page: int = 0, category_ids: list = None) -> List[Topic]:
+    params=[]
+    if category_ids and len(category_ids) > 0:
+        placeholder = ",".join(["?"] * len(category_ids))
+        query = f"SELECT * FROM topics WHERE category_id IN ({placeholder})"
+        params.extend(category_ids)
+    else:
+        query = "SELECT * FROM topics"
 
     if search:
-        search=search.replace("+", " ")
-        query += " WHERE name LIKE ?"
+        search = search.replace("+", " ")
+        if "WHERE" in query:
+            query += " AND name LIKE ?"
+        else:
+            query += " WHERE name LIKE ?"
         params.append(f"%{search}%")
 
     if sort == "asc":
-        query += f" ORDER BY id ASC"
+        query += " ORDER BY id ASC"
     else:
-        query += f" ORDER BY id DESC"
+        query += " ORDER BY id DESC"
 
     limit = 25
     offset = page * limit
