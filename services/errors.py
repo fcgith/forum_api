@@ -15,5 +15,10 @@ registration_user_exists = HTTPException(status_code=401, detail="Registration e
 #conversation errors
 conversation_not_found = HTTPException(status_code=402, detail="Conversation not found")
 
-#topic errors
+#category errors
 category_not_found = HTTPException(status_code=402, detail="Category not found")
+category_not_accessible = HTTPException(status_code=402, detail="Category not accessible")
+
+#topic errors
+topic_not_found = HTTPException(status_code=402, detail="Topic not found")
+topic_not_accessible = HTTPException(status_code=402, detail="Topic not accessible")
