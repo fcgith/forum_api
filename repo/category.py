@@ -2,12 +2,15 @@ from typing import List, Tuple
 from models.category import Category, CategoryCreate
 from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query
+from services.errors import not_found
+
 
 def gen_category(result: tuple) -> Category:
     return Category(
         id=result[0],
         name=result[1],
-        description=result[2]
+        description=result[2],
+        hidden=result[3]
     )
 
 def get_all_categories() -> List[Category] | None:
@@ -37,3 +40,41 @@ def get_categories_with_permissions(user_id: int) -> List[Tuple[Category, Permis
         permission = PermissionTypeEnum(row[3]) if row[3] is not None else PermissionTypeEnum.NO_PERMISSION
         categories.append((category, permission))
     return categories
+
+def get_all_category_ids() -> List[int]:
+    query = "SELECT id FROM categories"
+    return [row[0] for row in read_query(query)]
+
+def get_category_permissions(category_id: int, user_id: int) -> int:
+    query = "SELECT type FROM category_permissions WHERE category_id = ? AND user_id = ?"
+    result = read_query(query, (category_id, user_id))
+
+    return 1 if not result else result[0][0] # 1 = Default
+
+def is_category_viewable(category_id: int, user_id: int) -> bool:
+    perm = get_category_permissions(category_id, user_id)
+
+    query = "SELECT hidden FROM categories WHERE id = ?"
+    result = read_query(query, (category_id,))
+
+    if result:
+        ctype = result[0][0] # 0 for hidden, 1 for viewable
+    else:
+        raise not_found
+
+    if ctype == 1:
+        # hidden category
+        return perm >= 2
+    elif ctype == 0:
+        # public category
+        return perm >= 1
+    else:
+        return False
+
+def get_viewable_category_ids(user_id: int) -> List[int]:
+    categories = get_all_categories()
+    viewable_categories = []
+    for category in categories:
+        if is_category_viewable(category.id, user_id):
+            viewable_categories.append(category.id)
+    return viewable_categories
