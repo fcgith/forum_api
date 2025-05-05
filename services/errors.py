@@ -22,3 +22,7 @@ category_not_accessible = HTTPException(status_code=402, detail="Category not ac
 #topic errors
 topic_not_found = HTTPException(status_code=402, detail="Topic not found")
 topic_not_accessible = HTTPException(status_code=402, detail="Topic not accessible")
+
+#reply errors
+reply_not_found = HTTPException(status_code=402, detail="Reply not found")
+reply_not_accessible = HTTPException(status_code=403, detail="Reply not accessible")
