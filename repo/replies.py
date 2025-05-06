@@ -41,3 +41,19 @@ def add_reply_to_topic(content: str, topic_id: int, user_id: int) -> int | None:
     query = "INSERT INTO replies (content, topic_id, user_id) VALUES (?, ?, ?)"
     result = insert_query(query, (content, topic_id, user_id))
     return result
+
+def set_reply_as_best(reply_id: int, topic_id: int) -> bool | None:
+    query = "SELECT * FROM replies WHERE topic_id = ? AND best_reply = 1"
+    result = read_query(query, (topic_id,))
+    if result:
+        query = "UPDATE replies SET best_reply = 0 WHERE topic_id = ? AND best_reply = 1"
+        result = update_query(query, (topic_id,))
+        query = "UPDATE replies SET best_reply = 1 WHERE id = ?"
+        result = update_query(query, (reply_id,))
+        return True if result else False
+
+    query = "UPDATE replies SET best_reply = 1 WHERE id = ?"
+    result = update_query(query, (reply_id,))
+    return True if result else False
+
+print(set_reply_as_best(5, 3))
