@@ -55,5 +55,3 @@ def set_reply_as_best(reply_id: int, topic_id: int) -> bool | None:
     query = "UPDATE replies SET best_reply = 1 WHERE id = ?"
     result = update_query(query, (reply_id,))
     return True if result else False
-
-print(set_reply_as_best(5, 3))
