@@ -6,7 +6,8 @@ def gen_reply(reply: tuple) -> Reply:
                  content=reply[1],
                  date=reply[2],
                  topic_id=reply[3],
-                 user_id=reply[4])
+                 user_id=reply[4],
+                 best_reply=reply[5])
 
 def get_reply_by_id(reply_id: int) -> Reply | None:
     query = "SELECT * FROM replies WHERE id = ?"
