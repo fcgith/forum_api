@@ -6,6 +6,7 @@ class Category(BaseModel):
     id: int
     name: str
     description: str | None = None
+    hidden: int = 0
 
 
 class CategoryCreate(BaseModel):
