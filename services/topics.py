@@ -1,4 +1,4 @@
-from repo.topic import create_topic, get_topic_by_id, get_topics
+from repo.topic import create_topic, get_topic_by_id, get_topics, get_replies_by_topic_id
 from repo.category import get_category_by_id, get_viewable_category_ids, get_all_category_ids,is_category_viewable
 from models.topic import TopicCreate, TopicResponse
 from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found
@@ -45,7 +45,7 @@ class TopicsService:
             token: Authentication token for user validation.
 
         Returns:
-            Topic data
+            Topic data and list of replies
         """
         user = AuthToken.validate(token)
         if not user:
@@ -55,7 +55,12 @@ class TopicsService:
             raise topic_not_found
         if not is_category_viewable(topic.category_id, user.id) and not user.is_admin():
             raise category_not_accessible
-        return topic
+        replies = get_replies_by_topic_id(topic_id)
+
+        return {
+            "topic": topic,
+            "replies": replies
+        }
 
     @classmethod
     def get_topics(cls, search:str,sort:str,page:int,token: str):
