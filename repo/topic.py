@@ -33,10 +33,12 @@ def create_topic(data: TopicCreate, user_id: int) -> int | None:
     result = insert_query(query, (data.name, data.content, data.category_id, user_id))
     return result
 
-def get_topics(search: str = None, sort: str = "id DESC", page: int = 0, category_ids: list = None) -> List[Topic]:
+def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> List[Topic]:
     params=[]
+    sort = sort.lower()
+
     if category_ids and len(category_ids) > 0:
-        placeholder = ",".join(["?"] * len(category_ids))
+        placeholder = ", ".join(["?"] * len(category_ids))
         query = f"SELECT * FROM topics WHERE category_id IN ({placeholder})"
         params.extend(category_ids)
     else:
@@ -55,7 +57,7 @@ def get_topics(search: str = None, sort: str = "id DESC", page: int = 0, categor
     else:
         query += " ORDER BY id DESC"
 
-    limit = 25
+    limit = 10
     offset = page * limit
     query += " LIMIT ? OFFSET ?"
     params.extend([limit, offset])

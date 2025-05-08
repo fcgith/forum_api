@@ -8,6 +8,7 @@ class Reply(BaseModel):
     date: date
     topic_id: int
     user_id: int
+    best_reply: int = 0
 
 class ReplyCreate(BaseModel):
     content: str

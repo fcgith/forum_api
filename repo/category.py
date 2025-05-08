@@ -1,8 +1,8 @@
 from typing import List, Tuple
 from models.category import Category, CategoryCreate
 from models.category_permission import PermissionTypeEnum
-from data.connection import read_query, insert_query
-from services.errors import not_found
+from data.connection import read_query, insert_query, update_query
+from services.errors import not_found, category_not_found
 
 
 def gen_category(result: tuple) -> Category:
@@ -63,7 +63,7 @@ def is_category_viewable(category_id: int, user_id: int) -> bool:
     if result:
         ctype = result[0][0] # 0 for hidden, 1 for viewable
     else:
-        raise not_found # category not found
+        raise category_not_found # category not found
 
     if ctype == 1:
         # hidden category
@@ -75,9 +75,22 @@ def is_category_viewable(category_id: int, user_id: int) -> bool:
         return False
 
 def get_viewable_category_ids(user_id: int) -> List[int]:
-    categories = get_all_categories()
-    viewable_categories = []
-    for category in categories:
-        if is_category_viewable(category.id, user_id):
-            viewable_categories.append(category.id)
-    return viewable_categories
+    category_ids = get_all_category_ids()
+    return [
+        category_id
+        for category_id in category_ids
+        if is_category_viewable(category_id, user_id)
+    ]
+
+def set_category_permissions(category_id: int, user_id: int, permission: int) -> bool:
+    query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
+    result = read_query(query, (category_id, user_id))
+
+    if not result:
+        query = "INSERT INTO category_permissions (category_id, user_id, type) VALUES (?, ?, ?)"
+        result = insert_query(query, (category_id, user_id, permission))
+    else:
+        query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
+        result = update_query(query, (permission, category_id, user_id))
+
+    return True if result else False
