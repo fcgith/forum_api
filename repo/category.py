@@ -3,14 +3,15 @@ from models.category import Category, CategoryCreate
 from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query, update_query
 from services.errors import not_found, category_not_found
-
+from repo import topic as topics_repo
 
 def gen_category(result: tuple) -> Category:
     return Category(
         id=result[0],
         name=result[1],
         description=result[2],
-        hidden=result[3]
+        hidden=result[3],
+        topics_count=topics_repo.get_topics_count_by_category(result[0])
     )
 
 def get_all_categories() -> List[Category] | None:

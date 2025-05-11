@@ -31,6 +31,13 @@ def get_topics_by_category(category_id: int) -> List[Topic] | None:
         return topics
     return None
 
+def get_topics_count_by_category(category_id: int) -> int:
+    query = "SELECT COUNT(*) FROM topics WHERE category_id = ?"
+    result = read_query(query, (category_id,))
+    if result:
+        return result[0][0]
+    return 0
+
 def create_topic(data: TopicCreate, user_id: int) -> int | None:
     query = "INSERT INTO topics (name, content, category_id, user_id) VALUES (?, ?, ?, ?)"
     result = insert_query(query, (data.name, data.content, data.category_id, user_id))
