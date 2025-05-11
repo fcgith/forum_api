@@ -9,8 +9,7 @@ def gen_message(result: tuple) -> Message:
         content=result[1],
         date=result[2],
         conversation_id=result[3],
-        sender_id=result[4],
-        receiver_id=result[5]
+        sender_id=result[4]
     )
 
 def get_messages_by_conversation(conversation_id: int) -> List[Message] | None:
