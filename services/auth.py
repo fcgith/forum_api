@@ -1,5 +1,6 @@
 import repo.user as user_db
 from models.auth_model import LoginResponse, UserLogin, UserCreate, RegisterResponse
+from models.user import UserPublic, User
 from services.errors import access_denied, internal_error, registration_user_exists, invalid_credentials, not_found
 from services.utils import AuthToken
 
@@ -29,11 +30,10 @@ class AuthService:
         return RegisterResponse(message=f"User {created_id} created successfully")
 
     @classmethod
-    def decode_token_username(cls, token) -> dict:
+    def decode_token_username(cls, token) -> UserPublic | None:
         if AuthToken.validate_expiry(token):
-            user = AuthToken.validate(token)
+            user = AuthToken.validate(token, public=True)
             if not user:
                 raise not_found
-
-            return {"username": user.username, "id": user.id, "admin": user.is_admin()}
-        return {"error": "Invalid token"}
+            return user
+        return None
