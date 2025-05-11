@@ -63,6 +63,13 @@ class AuthToken:
             return False
 
     @classmethod
+    def validate_admin(cls, token: str) -> None | User:
+        user = cls.validate(token)
+        if user and user.is_admin():
+            return user
+        raise access_denied
+
+    @classmethod
     def validate_expiry(cls, token: str) -> bool:
         try:
             decoded = cls.decode(token)
