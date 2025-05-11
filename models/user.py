@@ -21,3 +21,4 @@ class UserPublic(BaseModel):
     username: str
     avatar: str | None = None
     creation_date: date
+    admin: int = 0

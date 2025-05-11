@@ -18,7 +18,8 @@ def gen_user(result: tuple, public: bool = False) -> User | UserPublic:
         id=result[0],
         username=result[1],
         avatar=result[5],
-        creation_date=result[7]
+        creation_date=result[7],
+        admin=result[6]
     )
 
 def get_all_users() -> List[User] | None:
