@@ -1,7 +1,8 @@
 import repo.user as user_db
 from models.auth_model import LoginResponse, UserLogin, UserCreate, RegisterResponse
 from models.user import UserPublic, User
-from services.errors import access_denied, internal_error, registration_user_exists, invalid_credentials, not_found
+from services.errors import access_denied, internal_error, registration_user_exists, invalid_credentials, not_found, \
+    invalid_token
 from services.utils import AuthToken
 
 class AuthService:
@@ -36,4 +37,4 @@ class AuthService:
             if not user:
                 raise not_found
             return user
-        return None
+        raise invalid_token
