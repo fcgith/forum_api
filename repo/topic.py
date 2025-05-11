@@ -1,7 +1,10 @@
 from typing import List
 
+from models.reply import Reply
 from models.topic import Topic, TopicCreate
 from data.connection import read_query, insert_query
+from repo.replies import gen_reply
+
 
 def gen_topic(result: tuple) -> Topic:
     return Topic(
@@ -66,3 +69,18 @@ def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_i
     if result:
         return [gen_topic(row) for row in result]
     return []
+
+
+def get_replies_by_topic_id(topic_id: int) -> list[Reply]:
+    """
+    Get all replies for a specific topic.
+
+    Args:
+        topic_id: ID of the topic
+
+    Returns:
+        List of Reply objects
+    """
+    query = "SELECT * FROM replies WHERE topic_id = ? ORDER BY date ASC"
+    results = read_query(query, (topic_id,))
+    return [gen_reply(reply) for reply in results] if results else []
