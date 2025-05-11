@@ -31,11 +31,9 @@ class AuthService:
     @classmethod
     def decode_token_username(cls, token) -> dict:
         if AuthToken.validate_expiry(token):
-            data = AuthToken.decode(token)
-            if data:
-                user = user_db.get_user_by_username(data["sub"])
-                if not user:
-                    raise not_found
+            user = AuthToken.validate(token)
+            if not user:
+                raise not_found
 
-                return {"username": data["sub"], "id": user.id}
+            return {"username": user.username, "id": user.id, "admin": user.is_admin()}
         return {"error": "Invalid token"}
