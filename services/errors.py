@@ -26,3 +26,4 @@ topic_not_accessible = HTTPException(status_code=402, detail="Topic not accessib
 #reply errors
 reply_not_found = HTTPException(status_code=402, detail="Reply not found")
 reply_not_accessible = HTTPException(status_code=403, detail="Reply not accessible")
+reply_invalid_data = HTTPException(status_code=400, detail="Invalid reply data")
