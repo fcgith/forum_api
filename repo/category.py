@@ -2,8 +2,10 @@ from typing import List, Tuple
 from models.category import Category, CategoryCreate
 from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query, update_query
+from models.user import User
 from services.errors import not_found, category_not_found
 from repo import topic as topics_repo
+from repo import user as user_repo
 
 def gen_category(result: tuple) -> Category:
     return Category(
@@ -20,6 +22,15 @@ def get_all_categories() -> List[Category] | None:
     if result:
         return [gen_category(row) for row in result]
     return []
+
+def get_all_viewable_categories(user: User) -> List[Category]:
+    placeholder = get_viewable_category_ids(user.id)
+    placeholder = [str(id) for id in placeholder]
+    query = f"SELECT * FROM categories WHERE id IN ({", ".join(placeholder)})"
+    result = read_query(query)
+    if not result:
+        return []
+    return [gen_category(row) for row in result]
 
 def get_category_by_id(category_id: int) -> Category | None:
     query = "SELECT * FROM categories WHERE id = ?"
@@ -54,6 +65,10 @@ def get_category_permissions(category_id: int, user_id: int) -> int:
 
 def is_category_viewable(category_id: int, user_id: int) -> bool:
     perm = get_category_permissions(category_id, user_id)
+    user = user_repo.get_user_by_id(user_id)
+
+    if user.is_admin():
+        return True
 
     if perm == 0:
         return False # no permission at all

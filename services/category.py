@@ -1,6 +1,9 @@
+from typing import List
+
 from models.category import Category, CategoryCreate
 import repo.category as category_repo
-from services.errors import not_found
+from services.errors import not_found, access_denied, invalid_credentials
+from services.utils import AuthToken
 
 
 class CategoryService:
@@ -10,6 +13,13 @@ class CategoryService:
         Retrieve all categories from the database.
         """
         return category_repo.get_all_categories()
+
+    @classmethod
+    def get_all_viewable(self, token: str) -> List[Category]:
+        user = AuthToken.validate(token)
+        if not user:
+            raise invalid_credentials
+        return category_repo.get_all_viewable_categories(user)
 
     @classmethod
     def get_by_id(cls, category_id: int) -> Category:

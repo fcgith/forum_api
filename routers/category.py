@@ -8,13 +8,14 @@ router = APIRouter(tags=["categories"])
 
 
 @router.get("/", response_model=List[Category])
-async def get_all_categories() -> List[Category]:
+async def get_all_categories(token: str) -> List[Category]:
     """
     Retrieve a list of all available categories.
 
+    :param token: Authentication token.
     :return: List of Category objects.
     """
-    return CategoryService.get_all()
+    return CategoryService.get_all_viewable(token)
 
 
 @router.get("/{category_id}", response_model=Category)
