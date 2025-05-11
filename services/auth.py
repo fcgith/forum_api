@@ -1,6 +1,6 @@
 import repo.user as user_db
 from models.auth_model import LoginResponse, UserLogin, UserCreate, RegisterResponse
-from services.errors import access_denied, internal_error, registration_user_exists, invalid_credentials
+from services.errors import access_denied, internal_error, registration_user_exists, invalid_credentials, not_found
 from services.utils import AuthToken
 
 class AuthService:
@@ -33,5 +33,9 @@ class AuthService:
         if AuthToken.validate_expiry(token):
             data = AuthToken.decode(token)
             if data:
-                return {"username": data["sub"]}
+                user = user_db.get_user_by_username(data["sub"])
+                if not user:
+                    raise not_found
+
+                return {"username": data["sub"], "id": user.id}
         return {"error": "Invalid token"}
