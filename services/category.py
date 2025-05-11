@@ -54,3 +54,14 @@ class CategoryService:
         AuthToken.validate_admin(token)
 
         return category_repo.create_category(data)
+
+    @classmethod
+    def get_topics_by_category_id(cls, category_id: int, token: str):
+        user = AuthToken.validate(token)
+        if not user:
+            raise invalid_credentials
+
+        if not category_repo.is_category_viewable(category_id, user.id):
+            raise access_denied
+
+        return category_repo.get_topics_in_category(category_id)

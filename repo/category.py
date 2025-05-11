@@ -2,7 +2,9 @@ from typing import List, Tuple
 from models.category import Category, CategoryCreate
 from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query, update_query
+from models.topic import Topic
 from models.user import User
+from repo.topic import gen_topic
 from services.errors import not_found, category_not_found
 from repo import topic as topics_repo
 from repo import user as user_repo
@@ -110,3 +112,9 @@ def set_category_permissions(category_id: int, user_id: int, permission: int) ->
         result = update_query(query, (permission, category_id, user_id))
 
     return True if result else False
+
+
+def get_topics_in_category(category_id) -> List[Topic] | []:
+    query = "SELECT * FROM topics WHERE category_id = ? ORDER BY id DESC"
+    result = read_query(query, (category_id,))
+    return [gen_topic(row) for row in result] if result else []
