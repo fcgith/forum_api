@@ -27,7 +27,7 @@ def set_reply_vote(reply_id: int, user_id: int, vote: int) -> bool | None:
         query = "INSERT INTO votes (reply_id, user_id, type) VALUES (?, ?, ?)"
         result = insert_query(query, (reply_id, user_id, vote))
 
-    return True if result else False
+    return True
 
 def get_reply_votes(reply_id: int) -> int:
     query = "SELECT type FROM votes WHERE reply_id = ?"

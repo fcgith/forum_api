@@ -1,6 +1,7 @@
 import mariadb
 from fastapi import APIRouter
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
+from models.user import UserPublic
 from services.auth import AuthService
 
 router = APIRouter(tags=["auth"])
@@ -24,7 +25,7 @@ async def register(user_data: UserCreate) -> RegisterResponse:
     return AuthService.register_user(user_data)
 
 @router.get("/")
-async def get_username_by_token(token: str) -> dict:
+async def get_username_by_token(token: str) -> UserPublic | None:
     """
     Retrieve a username by decoding the provided token.
 

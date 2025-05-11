@@ -29,11 +29,10 @@ class AuthService:
         return RegisterResponse(message=f"User {created_id} created successfully")
 
     @classmethod
-    def decode_token_username(cls, token) -> dict:
+    def decode_token_username(cls, token) -> UserPublic | None:
         if AuthToken.validate_expiry(token):
-            user = AuthToken.validate(token)
+            user = AuthToken.validate(token, public=True)
             if not user:
                 raise not_found
-
-            return {"username": user.username, "id": user.id}
-        return {"error": "Invalid token"}
+            return user
+        raise invalid_token

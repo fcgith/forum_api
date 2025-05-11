@@ -7,6 +7,7 @@ class Category(BaseModel):
     name: str
     description: str | None = None
     hidden: int = 0
+    topics_count: int = 0
 
 
 class CategoryCreate(BaseModel):

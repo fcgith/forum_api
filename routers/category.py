@@ -8,32 +8,35 @@ router = APIRouter(tags=["categories"])
 
 
 @router.get("/", response_model=List[Category])
-async def get_all_categories() -> List[Category]:
+async def get_all_categories(token: str) -> List[Category]:
     """
     Retrieve a list of all available categories.
 
+    :param token: Authentication token.
     :return: List of Category objects.
     """
-    return CategoryService.get_all()
+    return CategoryService.get_all_viewable(token)
 
 
 @router.get("/{category_id}", response_model=Category)
-async def get_category_by_id(category_id: int) -> Category:
+async def get_category_by_id(category_id: int,token: str) -> Category:
     """
     Retrieve a category by its unique ID.
 
     :param category_id: The ID of the category.
+    :param token: Authentication token for user validation.
     :return: Category object.
     """
-    return CategoryService.get_by_id(category_id)
+    return CategoryService.get_by_id(category_id,token)
 
 
-@router.post("/", response_model=int)
-async def create_category(data: CategoryCreate) -> int:
+@router.post("/{category_id}", response_model=int)
+async def create_category(data: CategoryCreate,token: str) -> int:
     """
     Create a new category with the given details.
 
     :param data: Category creation data.
+    :param token: Authentication token for user validation.
     :return: ID of the created category.
     """
-    return CategoryService.create(data)
+    return CategoryService.create(data,token)

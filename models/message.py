@@ -8,7 +8,6 @@ class Message(BaseModel):
     date: datetime
     conversation_id: int
     sender_id: int
-    receiver_id: int
 
 
 class MessageCreate(BaseModel):
