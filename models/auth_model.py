@@ -1,5 +1,5 @@
 from pydantic import BaseModel, validator, field_validator
-
+import re
 
 class UserCreate(BaseModel):
     username: str
@@ -21,11 +21,8 @@ class UserCreate(BaseModel):
 
     @field_validator('password')
     def validate_password(cls, v):
-        if len(v) < 8:
+        if not len(v) >= 8:
             raise ValueError('Password must be at least 8 characters long')
-        if not v.isalnum():
-            raise ValueError('Password must be alphanumeric')
-        return v
 
     @field_validator('email')
     def validate_email(cls, v):
