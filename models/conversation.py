@@ -7,6 +7,7 @@ class Conversation(BaseModel):
     date: datetime
     initiator_id: int
     receiver_id: int
+    seen: int = 0
 
 
 class ConversationCreate(BaseModel):

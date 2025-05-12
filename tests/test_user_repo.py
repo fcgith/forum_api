@@ -36,7 +36,8 @@ class TestUserRepo(unittest.TestCase):
             id=1,
             username="testuser",
             avatar="avatar.jpg",
-            creation_date="2023-01-01"
+            creation_date="2023-01-01",
+            admin=1
         )
 
         self.user_create_data = UserCreate(
@@ -209,7 +210,8 @@ class TestUserRepo(unittest.TestCase):
             id=id,
             username=f"user{id}",
             avatar="avatar.jpg",
-            creation_date="2023-01-01"
+            creation_date="2023-01-01",
+            admin=1
         )
 
         # Test with public=False (default)

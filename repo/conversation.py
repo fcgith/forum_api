@@ -17,7 +17,8 @@ def gen_conversation(result: tuple) -> Conversation:
         id=result[0],
         date=result[1],
         initiator_id=result[2],
-        receiver_id=result[3]
+        receiver_id=result[3],
+        seen=result[4]
     )
 
 def get_all_conversations() -> List[Conversation] | None:

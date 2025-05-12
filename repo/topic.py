@@ -1,7 +1,10 @@
 from typing import List
 
+from models.reply import Reply
 from models.topic import Topic, TopicCreate
 from data.connection import read_query, insert_query
+from repo.replies import gen_reply
+
 
 def gen_topic(result: tuple) -> Topic:
     return Topic(
@@ -27,6 +30,13 @@ def get_topics_by_category(category_id: int) -> List[Topic] | None:
         topics = [gen_topic(row) for row in result]
         return topics
     return None
+
+def get_topics_count_by_category(category_id: int) -> int:
+    query = "SELECT COUNT(*) FROM topics WHERE category_id = ?"
+    result = read_query(query, (category_id,))
+    if result:
+        return result[0][0]
+    return 0
 
 def create_topic(data: TopicCreate, user_id: int) -> int | None:
     query = "INSERT INTO topics (name, content, category_id, user_id) VALUES (?, ?, ?, ?)"
@@ -66,3 +76,18 @@ def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_i
     if result:
         return [gen_topic(row) for row in result]
     return []
+
+
+def get_replies_by_topic_id(topic_id: int) -> list[Reply]:
+    """
+    Get all replies for a specific topic.
+
+    Args:
+        topic_id: ID of the topic
+
+    Returns:
+        List of Reply objects
+    """
+    query = "SELECT * FROM replies WHERE topic_id = ? ORDER BY date ASC"
+    results = read_query(query, (topic_id,))
+    return [gen_reply(reply) for reply in results] if results else []
