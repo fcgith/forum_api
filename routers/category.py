@@ -1,7 +1,7 @@
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, Query, Body
 
-from models.category import Category, CategoryCreate
+from models.category import Category, CategoryCreate, UpdateHiddenStatus
 from models.topic import Topic
 from services.category import CategoryService
 
@@ -65,3 +65,7 @@ async def create_category(data: CategoryCreate,token: str) -> int:
     :return: ID of the created category.
     """
     return CategoryService.create(data,token)
+
+@router.post("/categories/update-hide-status")
+async def update_hide_status(data: UpdateHiddenStatus, token: str):
+    return CategoryService.update_hidden_status(data.category_id, data.hidden, token)

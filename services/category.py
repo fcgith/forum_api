@@ -3,7 +3,7 @@ from typing import List
 from models.category import Category, CategoryCreate
 import repo.category as category_repo
 import repo.topic as topics_repo
-from services.errors import not_found, access_denied, invalid_credentials
+from services.errors import not_found, access_denied, invalid_credentials, bad_request
 from services.utils import AuthToken
 
 
@@ -66,3 +66,17 @@ class CategoryService:
             raise access_denied
 
         return topics_repo.get_topics_in_category(category_id)
+
+    @classmethod
+    def update_hidden_status(cls, category_id: int, hidden: int, token: str):
+        AuthToken.validate_admin(token)
+
+        category = category_repo.get_category_by_id(category_id)
+
+        if not category:
+            raise not_found
+
+        if hidden not in (0, 1):
+            raise bad_request
+
+        return category_repo.update_hidden_status(category_id, hidden)

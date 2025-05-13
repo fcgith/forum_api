@@ -18,3 +18,7 @@ class CategoryCreate(BaseModel):
 class CategoryResponse(Category):
     content: str
     user_permission: Optional[PermissionTypeEnum] = None
+
+class UpdateHiddenStatus(BaseModel):
+    category_id: int
+    hidden: int = 0
