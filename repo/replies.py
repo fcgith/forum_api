@@ -1,5 +1,6 @@
 from data.connection import read_query, update_query, insert_query
 from models.reply import Reply
+from repo.user import get_user_by_id
 
 def gen_reply(reply: tuple) -> Reply:
     return Reply(id=reply[0],
@@ -7,7 +8,8 @@ def gen_reply(reply: tuple) -> Reply:
                  date=reply[2],
                  topic_id=reply[3],
                  user_id=reply[4],
-                 best_reply=reply[5])
+                 best_reply=reply[5],
+                 user_name=get_user_by_id(reply[4]).username)
 
 def get_reply_by_id(reply_id: int) -> Reply | None:
     query = "SELECT * FROM replies WHERE id = ?"
@@ -56,3 +58,9 @@ def set_reply_as_best(reply_id: int, topic_id: int) -> bool | None:
     query = "UPDATE replies SET best_reply = 1 WHERE id = ?"
     result = update_query(query, (reply_id,))
     return True if result else False
+
+def get_replies_in_topic(topic_id):
+    query = "SELECT * FROM replies WHERE topic_id = ? ORDER BY id ASC"
+    result = read_query(query, (topic_id,))
+    result = [gen_reply(row) for row in result]
+    return result

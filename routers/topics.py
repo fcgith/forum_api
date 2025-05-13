@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from models.topic import TopicCreate, TopicResponse
+from services.replies import RepliesService
 from services.topics import TopicsService
 
 router = APIRouter(tags=["topics"])
@@ -23,6 +24,13 @@ async def get_topic(token: str,topic_id: int):
     Get a topic by ID
     """
     return TopicsService.get_topic(topic_id,token)
+
+@router.get("/{topic_id}/replies")
+async def get_topic(token: str,topic_id: int):
+    """
+    Get a topic by ID
+    """
+    return RepliesService.get_topic_replies(topic_id, token)
 
 @router.get("/")
 async def get_topics(token: str,search:str=None,sort:str="DESC",page:int=0,):
