@@ -38,3 +38,7 @@ async def get_topics(token: str,search:str=None,sort:str="DESC",page:int=0,):
     Get all topics
     """
     return TopicsService.get_topics(token=token, search=search, sort=sort, page=page)
+
+@router.put("/{topic_id}/lock")
+async def lock_topic(topic_id: int, token: str) -> bool:
+    return TopicsService.lock_topic_by_id(topic_id, token)

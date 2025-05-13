@@ -2,7 +2,7 @@ from typing import List
 
 from models.reply import Reply
 from models.topic import Topic, TopicCreate
-from data.connection import read_query, insert_query
+from data.connection import read_query, insert_query, update_query
 from repo.replies import gen_reply
 from repo.user import get_user_by_id
 import repo.category as category_repo
@@ -104,3 +104,9 @@ def get_topics_in_category(category_id) -> List[Topic] | []:
     query = "SELECT * FROM topics WHERE category_id = ? ORDER BY id DESC"
     result = read_query(query, (category_id,))
     return [gen_topic(row) for row in result] if result else []
+
+
+def lock_topic(topic_id) -> bool:
+    query = "UPDATE topics SET locked = 1 WHERE id = ?"
+    result = update_query(query, (topic_id,))
+    return True if result > 0 else False

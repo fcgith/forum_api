@@ -1,4 +1,4 @@
-from repo.topic import create_topic, get_topic_by_id, get_topics, get_replies_by_topic_id
+import repo.topic as topic_repo
 from repo.category import get_category_by_id, get_viewable_category_ids, get_all_category_ids,is_category_viewable
 from models.topic import TopicCreate, TopicResponse
 from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found
@@ -29,7 +29,7 @@ class TopicsService:
         if not is_category_viewable(data.category_id, user.id):
             raise category_not_accessible
 
-        topic_id = create_topic(data, user.id)
+        topic_id = topic_repo.create_topic(data, user.id)
         if not topic_id:
             raise topic_not_found
 
@@ -50,7 +50,7 @@ class TopicsService:
         user = AuthToken.validate(token)
         if not user:
             raise invalid_token
-        topic = get_topic_by_id(topic_id)
+        topic = topic_repo.get_topic_by_id(topic_id)
         if not topic:
             raise topic_not_found
         if not is_category_viewable(topic.category_id, user.id) and not user.is_admin():
@@ -81,4 +81,14 @@ class TopicsService:
         else:
             viewable_category_ids = get_viewable_category_ids(user.id)
 
-        return get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
+        return topic_repo.get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
+
+    @classmethod
+    def lock_topic_by_id(cls, topic_id, token) -> bool:
+        AuthToken.validate_admin(token)
+
+        topic = topic_repo.get_topic_by_id(topic_id)
+        if not topic:
+            raise topic_not_found
+
+        return topic_repo.lock_topic(topic_id)
