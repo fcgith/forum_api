@@ -32,6 +32,27 @@ async def get_category_by_id(category_id: int,token: str) -> Category:
 
 @router.get("/{category_id}/topics", response_model=List[Topic])
 async def get_topics_by_category(category_id: int,token: str) -> List[Topic]:
+    """
+    Fetch and return a list of topics for a specified category.
+
+    This function interacts with the `CategoryService` to retrieve a list
+    of topics associated with the given category ID. The function expects
+    the requester to provide a valid token for authorization.
+
+    Args:
+        category_id: An integer representing the unique ID of the category
+            for which topics are to be fetched.
+        token: A string containing the authorization token required to
+            access this endpoint.
+
+    Returns:
+        A list of `Topic` objects representing the topics associated
+        with the given category.
+
+    Raises:
+        HTTPException: If an error occurs during validation or if topics
+            for the specified category cannot be retrieved.
+    """
     return CategoryService.get_topics_by_category_id(category_id, token)
 
 @router.post("/{category_id}", response_model=int)
