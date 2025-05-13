@@ -4,7 +4,7 @@ from models.category import Category, CategoryCreate
 import repo.category as category_repo
 import repo.topic as topics_repo
 import repo.user as user_repo
-from services.errors import not_found, access_denied, invalid_credentials, bad_request
+from services.errors import not_found, access_denied, invalid_credentials, bad_request, category_not_found
 from services.utils import AuthToken
 
 
@@ -98,3 +98,13 @@ class CategoryService:
             raise bad_request
 
         return category_repo.update_permissions(category_id, user_id, permission)
+
+    @classmethod
+    def hide_category_by_id(cls, category_id, token) -> bool:
+        AuthToken.validate_admin(token)
+
+        category = cls.get_by_id(category_id, token)
+        if not category:
+            raise category_not_found
+
+        return category_repo.hide_category(category_id)

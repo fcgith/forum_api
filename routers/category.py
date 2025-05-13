@@ -82,3 +82,7 @@ async def update_user_permissions(
 @router.get("/get-users-with-permissions/{category_id}", response_model=dict)
 async def get_users_with_view_or_read_perms(category_id: int, token: str) -> dict:
     return UserService.get_users_with_permissions_for_category(category_id, token)
+
+@router.put("/{category_id}/hide/{token}")
+async def hide_category(category_id: int, token: str) -> bool:
+    return CategoryService.hide_category_by_id(category_id, token)

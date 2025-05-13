@@ -129,3 +129,9 @@ def update_permissions(category_id, user_id, permission) -> bool:
         query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
         result = update_query(query, (permission, category_id, user_id))
     return True
+
+
+def hide_category(category_id) -> bool:
+    query = "UPDATE categories SET hidden = 1 WHERE id = ?"
+    result = update_query(query, (category_id,))
+    return True if result > 0 else False
