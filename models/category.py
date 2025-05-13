@@ -22,3 +22,8 @@ class CategoryResponse(Category):
 class UpdateHiddenStatus(BaseModel):
     category_id: int
     hidden: int = 0
+
+class UpdateUserPermission(BaseModel):
+    category_id: int
+    user_id: int
+    permission: int = 1

@@ -4,7 +4,7 @@ from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query, update_query
 from models.topic import Topic
 from models.user import User
-from services.errors import not_found, category_not_found
+from services.errors import not_found, category_not_found, bad_request
 from repo import topic as topics_repo
 from repo import user as user_repo
 
@@ -117,3 +117,17 @@ def update_hidden_status(category_id: int, hidden: int) -> bool:
     query = "UPDATE categories SET hidden = ? WHERE id = ?"
     result = update_query(query, (hidden, category_id))
     return True if result else False
+
+
+def update_permissions(category_id, user_id, permission) -> bool:
+    query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
+    result = read_query(query, (category_id, user_id))
+    if not result:
+        query = "INSERT INTO category_permissions (category_id, user_id, type) VALUES (?, ?, ?)"
+        result = insert_query(query, (category_id, user_id, permission))
+    else:
+        query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
+        result = update_query(query, (permission, category_id, user_id))
+    if not result:
+        raise bad_request
+    return True

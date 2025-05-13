@@ -1,11 +1,11 @@
 from typing import List
-from fastapi import APIRouter, Query, Body
+from fastapi import APIRouter, Query, Body, Form
 
-from models.category import Category, CategoryCreate, UpdateHiddenStatus
+from models.category import Category, CategoryCreate, UpdateHiddenStatus, UpdateUserPermission
 from models.topic import Topic
 from services.category import CategoryService
 
-router = APIRouter(tags=["categories"])
+router = APIRouter()
 
 
 @router.get("/", response_model=List[Category])
@@ -66,6 +66,10 @@ async def create_category(data: CategoryCreate,token: str) -> int:
     """
     return CategoryService.create(data,token)
 
-@router.post("/categories/update-hide-status")
-async def update_hide_status(data: UpdateHiddenStatus, token: str):
-    return CategoryService.update_hidden_status(data.category_id, data.hidden, token)
+@router.post("/update_hide_status", response_model=bool)
+async def update_hide_status(data: UpdateHiddenStatus, token: str) -> bool:
+    return CategoryService.update_hidden_status(data.category_id, data.hidden, "token")
+
+@router.get("/update-user-permissions")
+async def update_user_permissions(data: UpdateUserPermission, token: str) -> tuple:
+    return CategoryService.update_user_permissions(data.category_id, data.user_id, data.permission, token)
