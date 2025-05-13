@@ -1,11 +1,12 @@
 from typing import List
-from fastapi import APIRouter, Query, Body, Form
+from fastapi import APIRouter, Query, Body, Form, Path
 
 from models.category import Category, CategoryCreate, UpdateHiddenStatus, UpdateUserPermission
 from models.topic import Topic
 from services.category import CategoryService
+from services.user import UserService
 
-router = APIRouter()
+router = APIRouter(tags=["categories"])
 
 
 @router.get("/", response_model=List[Category])
@@ -66,10 +67,18 @@ async def create_category(data: CategoryCreate,token: str) -> int:
     """
     return CategoryService.create(data,token)
 
-@router.post("/update_hide_status", response_model=bool)
+@router.post("/update-hide-status/{token}", response_model=bool)
 async def update_hide_status(data: UpdateHiddenStatus, token: str) -> bool:
-    return CategoryService.update_hidden_status(data.category_id, data.hidden, "token")
+    return CategoryService.update_hidden_status(data.category_id, data.hidden, token)
 
-@router.get("/update-user-permissions")
-async def update_user_permissions(data: UpdateUserPermission, token: str) -> tuple:
+
+@router.post("/update-user-permissions/{token}", response_model=bool)
+async def update_user_permissions(
+        data: UpdateUserPermission,
+        token: str = Path(..., description="Authentication token")
+) -> bool:
     return CategoryService.update_user_permissions(data.category_id, data.user_id, data.permission, token)
+
+@router.get("/get-users-with-permissions/{category_id}", response_model=dict)
+async def get_users_with_view_or_read_perms(category_id: int, token: str) -> dict:
+    return UserService.get_users_with_permissions_for_category(category_id, token)

@@ -32,7 +32,7 @@ def get_all_users() -> List[User] | None:
     users = [gen_user(row) for row in result]
     return users
 
-def get_user_by_id(user_id: int, public: bool = False) -> User | None:
+def get_user_by_id(user_id: int, public: bool = False, tup=False) -> User | tuple | None:
     """
     Returns User if such exists by id or UserPublic if such is requested via service
     :param user_id: int user id
@@ -42,7 +42,7 @@ def get_user_by_id(user_id: int, public: bool = False) -> User | None:
     query = "SELECT * FROM users WHERE id = ?"
     result = read_query(query, (user_id,))
     if result:
-        return gen_user(result[0], public)
+        return gen_user(result[0], public) if not tup else result[0]
     else:
         return None
 
@@ -108,3 +108,16 @@ def get_users_in_list_by_id(lst: List[int], public: bool = False) -> List[User] 
     :return: List of User or UserPublic objects
     """
     return [get_user_by_id(user_id, public) for user_id in lst]
+
+
+def get_users_with_permissions_for_category(category_id) -> dict:
+    query = "SELECT user_id, type FROM category_permissions WHERE category_id = ? AND type > 1"
+    result = read_query(query, (category_id,))
+    data = {"users":{}}
+    print(result)
+    if result:
+        count = 0
+        for row in result:
+            count += 1
+            data["users"][count] = {"user": get_user_by_id(row[0]), "permission": row[1]}
+    return data

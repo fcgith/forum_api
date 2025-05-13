@@ -128,6 +128,4 @@ def update_permissions(category_id, user_id, permission) -> bool:
     else:
         query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
         result = update_query(query, (permission, category_id, user_id))
-    if not result:
-        raise bad_request
     return True

@@ -94,6 +94,7 @@ class CategoryService:
             raise not_found
 
         if permission not in (0, 1, 2, 3):
+            print(permission)
             raise bad_request
 
-        category_repo.update_permissions(category_id, user_id, permission)
+        return category_repo.update_permissions(category_id, user_id, permission)

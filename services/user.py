@@ -1,7 +1,7 @@
 from typing import List
 
 from models.user import User, UserPublic
-from repo.user import get_user_by_id, get_user_by_username, get_all_users
+import repo.user as user_repo
 from services.errors import access_denied, not_found
 from services.utils import AuthToken
 
@@ -9,7 +9,7 @@ class UserService:
 
     @classmethod
     def get_user(cls, user_id: int, public: bool = False) -> User | UserPublic | None:
-        user = get_user_by_id(user_id, public)
+        user = user_repo.get_user_by_id(user_id, public)
         if user:
             return user
         else:
@@ -22,4 +22,9 @@ class UserService:
         if not user or not user.is_admin():
             raise access_denied
 
-        return get_all_users()
+        return user_repo.get_all_users()
+
+    @classmethod
+    def get_users_with_permissions_for_category(cls, category_id: int, token: str) -> dict:
+        AuthToken.validate_admin(token)
+        return user_repo.get_users_with_permissions_for_category(category_id)
