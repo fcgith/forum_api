@@ -8,7 +8,10 @@ class Topic(BaseModel):
     content: str
     date: date
     category_id: int
+    category_name: str = "Error fetching category name"
     user_id: int
+    user_name: str | None = None
+    replies_count: int = 0
 
 
 class TopicCreate(BaseModel):

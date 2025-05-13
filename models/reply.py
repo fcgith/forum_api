@@ -9,6 +9,7 @@ class Reply(BaseModel):
     topic_id: int
     user_id: int
     best_reply: int = 0
+    user_name: str = "Error fetching username"
 
 class ReplyCreate(BaseModel):
     content: str

@@ -9,7 +9,7 @@ router = APIRouter(tags=["auth"])
 @router.post("/login", response_model=LoginResponse)
 async def login(user_data: UserLogin) -> LoginResponse:
     """
-    Handles user login by validating the provided credentials and returning a
+    Handles all user login by validating the provided credentials and returning a
     login response containing authentication information. This endpoint is
     responsible for managing user authentication operations.
     """

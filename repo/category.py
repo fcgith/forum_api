@@ -4,7 +4,6 @@ from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query, update_query
 from models.topic import Topic
 from models.user import User
-from repo.topic import gen_topic
 from services.errors import not_found, category_not_found
 from repo import topic as topics_repo
 from repo import user as user_repo
@@ -26,9 +25,9 @@ def get_all_categories() -> List[Category] | None:
     return []
 
 def get_all_viewable_categories(user: User) -> List[Category]:
-    placeholder = get_viewable_category_ids(user.id)
-    placeholder = [str(id) for id in placeholder]
-    query = f"SELECT * FROM categories WHERE id IN ({", ".join(placeholder)})"
+    viewable_ids = get_viewable_category_ids(user.id)
+    viewable_ids = ", ".join([str(id) for id in viewable_ids])
+    query = f"SELECT * FROM categories WHERE id IN ({viewable_ids}) ORDER BY name ASC"
     result = read_query(query)
     if not result:
         return []
@@ -112,9 +111,3 @@ def set_category_permissions(category_id: int, user_id: int, permission: int) ->
         result = update_query(query, (permission, category_id, user_id))
 
     return True if result else False
-
-
-def get_topics_in_category(category_id) -> List[Topic] | []:
-    query = "SELECT * FROM topics WHERE category_id = ? ORDER BY id DESC"
-    result = read_query(query, (category_id,))
-    return [gen_topic(row) for row in result] if result else []

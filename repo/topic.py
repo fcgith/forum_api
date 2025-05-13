@@ -4,6 +4,8 @@ from models.reply import Reply
 from models.topic import Topic, TopicCreate
 from data.connection import read_query, insert_query
 from repo.replies import gen_reply
+from repo.user import get_user_by_id
+import repo.category as category_repo
 
 
 def gen_topic(result: tuple) -> Topic:
@@ -13,8 +15,10 @@ def gen_topic(result: tuple) -> Topic:
         content=result[2],
         date=result[3],
         category_id=result[4],
-        user_id=result[5]
-    )
+        category_name=category_repo.get_category_by_id(result[4]).name,
+        user_id=result[5],
+        user_name=get_user_by_id(result[5]).username if result[5] else None,
+        replies_count=len(get_replies_by_topic_id(result[0])))
 
 def get_topic_by_id(topic_id: int) -> Topic | None:
     query = "SELECT * FROM topics WHERE id = ?"
@@ -45,7 +49,10 @@ def create_topic(data: TopicCreate, user_id: int) -> int | None:
 
 def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> List[Topic]:
     params=[]
-    sort = sort.lower()
+    if isinstance(sort, str):
+        sort = sort.lower()
+    else:
+        sort = "desc"
 
     if category_ids and len(category_ids) > 0:
         placeholder = ", ".join(["?"] * len(category_ids))
@@ -91,3 +98,9 @@ def get_replies_by_topic_id(topic_id: int) -> list[Reply]:
     query = "SELECT * FROM replies WHERE topic_id = ? ORDER BY date ASC"
     results = read_query(query, (topic_id,))
     return [gen_reply(reply) for reply in results] if results else []
+
+
+def get_topics_in_category(category_id) -> List[Topic] | []:
+    query = "SELECT * FROM topics WHERE category_id = ? ORDER BY id DESC"
+    result = read_query(query, (category_id,))
+    return [gen_topic(row) for row in result] if result else []
