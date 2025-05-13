@@ -76,7 +76,7 @@ async def update_hide_status(token: str, data: UpdateHiddenStatus) -> bool:
 async def update_user_permissions(token: str, data: UpdateUserPermission) -> bool:
     return CategoryService.update_user_permissions(data.category_id, data.user_id, data.permission, token)
 
-@router.get("{category_id}/get-users-with-permissions", response_model=dict)
+@router.get("/{category_id}/get-users-with-permissions", response_model=dict)
 async def get_users_with_view_or_read_perms(token: str, category_id: int) -> dict:
     return UserService.get_users_with_permissions_for_category(category_id, token)
 
