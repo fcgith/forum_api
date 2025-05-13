@@ -6,12 +6,12 @@ while true; do
     if [ $? -eq 0 ]; then
         echo "[$(date)] Git pull successful"
         # Kill any existing main.py process
-        pkill -f "python main.py"
+        #pkill -f "python main.py"
         # Start main.py in the background
         python main.py &
     else
         echo "[$(date)] Git pull failed"
     fi
-    echo "[$(date)] Sleeping for 300 seconds"
+    echo "[$(date)] Sleeping for 60 seconds"
     sleep 60
 done
