@@ -45,7 +45,7 @@ class TopicsService:
             token: Authentication token for user validation.
 
         Returns:
-            Topic data and list of replies
+            Topic data
         """
         user = AuthToken.validate(token)
         if not user:
@@ -55,12 +55,8 @@ class TopicsService:
             raise topic_not_found
         if not is_category_viewable(topic.category_id, user.id) and not user.is_admin():
             raise category_not_accessible
-        replies = get_replies_by_topic_id(topic_id)
 
-        return {
-            "topic": topic,
-            "replies": replies
-        }
+        return topic
 
     @classmethod
     def get_topics(cls, token: str, search:str,page:int=0,sort:str="DESC"):
