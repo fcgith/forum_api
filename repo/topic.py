@@ -98,3 +98,9 @@ def get_replies_by_topic_id(topic_id: int) -> list[Reply]:
     query = "SELECT * FROM replies WHERE topic_id = ? ORDER BY date ASC"
     results = read_query(query, (topic_id,))
     return [gen_reply(reply) for reply in results] if results else []
+
+
+def get_topics_in_category(category_id) -> List[Topic] | []:
+    query = "SELECT * FROM topics WHERE category_id = ? ORDER BY id DESC"
+    result = read_query(query, (category_id,))
+    return [gen_topic(row) for row in result] if result else []

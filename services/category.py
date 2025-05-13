@@ -2,6 +2,7 @@ from typing import List
 
 from models.category import Category, CategoryCreate
 import repo.category as category_repo
+import repo.topic as topics_repo
 from services.errors import not_found, access_denied, invalid_credentials
 from services.utils import AuthToken
 
@@ -64,4 +65,4 @@ class CategoryService:
         if not category_repo.is_category_viewable(category_id, user.id):
             raise access_denied
 
-        return category_repo.get_topics_in_category(category_id)
+        return topics_repo.get_topics_in_category(category_id)
