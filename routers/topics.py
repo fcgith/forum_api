@@ -25,8 +25,8 @@ async def get_topic(token: str,topic_id: int):
     return TopicsService.get_topic(topic_id,token)
 
 @router.get("/")
-async def get_topics(token: str,search:str=None,sort:str=None,page:int=0,):
+async def get_topics(token: str,search:str=None,sort:str="DESC",page:int=0,):
     """
     Get all topics
     """
-    return TopicsService.get_topics(search,sort,page,token)
+    return TopicsService.get_topics(token=token, search=search, sort=sort, page=page)

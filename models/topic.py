@@ -9,6 +9,8 @@ class Topic(BaseModel):
     date: date
     category_id: int
     user_id: int
+    user_name: str | None = None
+    replies_count: int = 0
 
 
 class TopicCreate(BaseModel):

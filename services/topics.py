@@ -63,7 +63,7 @@ class TopicsService:
         }
 
     @classmethod
-    def get_topics(cls, search:str,sort:str,page:int,token: str):
+    def get_topics(cls, token: str, search:str,page:int=0,sort:str="DESC"):
         """
         Retrieve a list of topics with optional search, sorting, and pagination.
 
@@ -85,4 +85,4 @@ class TopicsService:
         else:
             viewable_category_ids = get_viewable_category_ids(user.id)
 
-        return get_topics(search, sort, page, category_ids=viewable_category_ids)
+        return get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
