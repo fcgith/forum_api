@@ -5,13 +5,13 @@ while true; do
     git pull origin main
     if [ $? -eq 0 ]; then
         echo "[$(date)] Git pull successful"
-        # Check if Uvicorn is running and kill it
-        pkill -f "uvicorn"
-        # Start Uvicorn in the background
-        uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
+        # Kill any existing main.py process
+        pkill -f "python main.py"
+        # Start main.py in the background
+        python main.py &
     else
         echo "[$(date)] Git pull failed"
     fi
     echo "[$(date)] Sleeping for 300 seconds"
-    sleep 60
+    sleep 300
 done
