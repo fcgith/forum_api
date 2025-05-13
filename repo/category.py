@@ -28,7 +28,7 @@ def get_all_categories() -> List[Category] | None:
 def get_all_viewable_categories(user: User) -> List[Category]:
     placeholder = get_viewable_category_ids(user.id)
     placeholder = [str(id) for id in placeholder]
-    query = f"SELECT * FROM categories WHERE id IN ({", ".join(placeholder)}) SORT BY 'name' ASC"
+    query = f"SELECT * FROM categories WHERE id IN ({", ".join(placeholder)}) ORDER BY name ASC"
     result = read_query(query)
     if not result:
         return []
