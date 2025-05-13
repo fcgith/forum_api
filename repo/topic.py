@@ -5,6 +5,7 @@ from models.topic import Topic, TopicCreate
 from data.connection import read_query, insert_query
 from repo.replies import gen_reply
 from repo.user import get_user_by_id
+import repo.category as category_repo
 
 
 def gen_topic(result: tuple) -> Topic:
@@ -14,6 +15,7 @@ def gen_topic(result: tuple) -> Topic:
         content=result[2],
         date=result[3],
         category_id=result[4],
+        category_name=category_repo.get_category_by_id(result[4]).name,
         user_id=result[5],
         user_name=get_user_by_id(result[5]).username if result[5] else None,
         replies_count=len(get_replies_by_topic_id(result[0])))
