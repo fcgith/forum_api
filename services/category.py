@@ -75,7 +75,6 @@ class CategoryService:
         category = category_repo.get_category_by_id(category_id)
 
         if not category:
-            print(category)
             raise not_found
 
         if hidden not in (0, 1):

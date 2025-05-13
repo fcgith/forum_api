@@ -24,9 +24,6 @@ class AuthToken:
 
     @classmethod
     def decode(cls, token: str) -> Dict:
-        # Log the token and its type for debugging
-        print(f"Decoding token: {token}, Type: {type(token)}")
-        # Ensure token is a string; convert from bytes if necessary
         if isinstance(token, bytes):
             token = token.decode('utf-8')
         elif not isinstance(token, str):
@@ -44,10 +41,8 @@ class AuthToken:
             decoded = cls.decode(token)
             exp = decoded.get('exp')
             if exp is None or not isinstance(exp, (int, float)):
-                print("Invalid or missing 'exp' claim")
                 return False
             current_time = datetime.now(timezone.utc).timestamp()
-            print(f"Current time: {current_time}, Token exp: {exp}")  # Debugging
             return current_time < exp
         except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
             print(f"Token validation error: {str(e)}")
@@ -55,7 +50,6 @@ class AuthToken:
 
     @classmethod
     def validate(cls, token: str, public: bool = False) -> User | UserPublic | bool:
-        print(token)
         valid_date = cls.validate_expiry(token)
         if valid_date:
             try:
