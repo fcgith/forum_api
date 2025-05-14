@@ -104,7 +104,7 @@ def get_all_category_ids() -> List[int]:
 def get_user_category_permission(category_id: int, user: User) -> int:
     query = "SELECT type FROM category_permissions WHERE category_id = ? AND user_id = ?"
     result = read_query(query, (category_id, user.id))
-    return 1 if not result else result[0][0] # 1 = Default
+    return 1 if len(result) == 0 else result[0][0] # 1 = Default
 
 def update_hidden_status(category_id: int, hidden: int) -> bool:
     query = "UPDATE categories SET hidden = ? WHERE id = ?"
