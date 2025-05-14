@@ -9,27 +9,50 @@ router = APIRouter(tags=["auth"])
 @router.post("/login", response_model=LoginResponse)
 async def login(user_data: UserLogin) -> LoginResponse:
     """
-    Handles all user login by validating the provided credentials and returning a
-    login response containing authentication information. This endpoint is
-    responsible for managing user authentication operations.
+    Authenticate a user with the provided credentials.
+
+    Parameters
+    ----------
+    user_data : UserLogin
+        The login data including username and password.
+
+    Returns
+    -------
+    LoginResponse
+        A response containing authentication tokens and user information.
     """
     return AuthService.login_user(user_data)
 
 @router.post("/register", response_model=RegisterResponse)
 async def register(user_data: UserCreate) -> RegisterResponse:
     """
-    Handles the creation of a new user by taking user
-    details provided and returning a response containing the registration status and other relevant information
-    upon successful registration.
+    Register a new user with the provided information.
+
+    Parameters
+    ----------
+    user_data : UserCreate
+        The data required to create a new user account.
+
+    Returns
+    -------
+    RegisterResponse
+        A response indicating the result and status of the registration process.
     """
     return AuthService.register_user(user_data)
 
 @router.get("/")
 async def get_username_by_token(token: str) -> UserPublic | None:
     """
-    Retrieve a username by decoding the provided token.
+    Retrieve public user information by decoding a JWT token.
 
-    :param token: A JWT token.
-    :return: The username associated with the token.
+    Parameters
+    ----------
+    token : str
+        A JWT token used to identify and authenticate the user.
+
+    Returns
+    -------
+    UserPublic or None
+        The public user information if the token is valid, otherwise None.
     """
     return AuthService.decode_token_username(token)
