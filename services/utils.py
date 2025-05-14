@@ -4,7 +4,7 @@ from typing import Dict
 
 from models.user import User, UserPublic
 from repo.user import get_user_by_username
-from services.errors import access_denied
+from services.errors import access_denied, invalid_token
 
 
 class AuthToken:
@@ -14,6 +14,7 @@ class AuthToken:
 
     @classmethod
     def generate(cls, data: dict) -> str:
+        ## TODO: docstring
         encode_data = data.copy()
         encode_data['exp'] = (datetime.now(timezone.utc) + timedelta(minutes=60*8)).timestamp()
         token = jwt.encode(encode_data, cls.SECRET_KEY, algorithm=cls.ALGORITHM)
@@ -24,19 +25,21 @@ class AuthToken:
 
     @classmethod
     def decode(cls, token: str) -> Dict:
+        ## TODO: docstring
         if isinstance(token, bytes):
             token = token.decode('utf-8')
         elif not isinstance(token, str):
-            raise jwt.InvalidTokenError(f"Token must be a string, got {type(token)}")
+            raise invalid_token
         try:
             decoded = jwt.decode(token, cls.SECRET_KEY, algorithms=[cls.ALGORITHM])
             return decoded
         except jwt.InvalidTokenError as e:
             print(f"Decode error: {str(e)}")
-            raise
+            raise invalid_token
 
     @classmethod
     def validate_expiry(cls, token: str) -> bool:
+        ## TODO: docstring
         try:
             decoded = cls.decode(token)
             exp = decoded.get('exp')
@@ -50,6 +53,7 @@ class AuthToken:
 
     @classmethod
     def validate(cls, token: str, public: bool = False) -> User | UserPublic | bool:
+        ## TODO: docstring
         valid_date = cls.validate_expiry(token)
         if valid_date:
             try:
@@ -64,6 +68,7 @@ class AuthToken:
 
     @classmethod
     def validate_admin(cls, token: str, public: bool = False) -> None | User:
+        ## TODO: docstring
         user = cls.validate(token, public=public)
         if user.is_admin():
             return user
