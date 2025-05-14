@@ -56,43 +56,53 @@ def get_all_topics() -> dict:
     return {"pages": pages, "topics": topics}
 
 def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> dict | None:
-    params=[]
+    params = []
     if isinstance(sort, str):
         sort = sort.lower()
     else:
         sort = "desc"
 
+    # Base query for counting total topics
+    count_query = "SELECT COUNT(*) FROM topics"
+    select_query = "SELECT * FROM topics"
     if category_ids and len(category_ids) > 0:
         placeholder = ", ".join(["?"] * len(category_ids))
-        query = f"SELECT * FROM topics WHERE category_id IN ({placeholder})"
+        count_query += f" WHERE category_id IN ({placeholder})"
+        select_query += f" WHERE category_id IN ({placeholder})"
         params.extend(category_ids)
-    else:
-        query = "SELECT * FROM topics"
-
 
     if search:
         search = search.replace("+", " ")
-        if "WHERE" in query:
-            query += " AND name LIKE ?"
+        if "WHERE" in count_query:
+            count_query += " AND name LIKE ?"
+            select_query += " AND name LIKE ?"
         else:
-            query += " WHERE name LIKE ?"
+            count_query += " WHERE name LIKE ?"
+            select_query += " WHERE name LIKE ?"
         params.append(f"%{search}%")
 
-    if sort == "asc":
-        query += " ORDER BY id ASC"
-    else:
-        query += " ORDER BY id DESC"
+    # Execute count query to get total number of topics
+    count_params = params.copy()
+    total_topics = read_query(count_query, tuple(count_params))[0][0]
 
+    # Add sorting to select query
+    if sort == "asc":
+        select_query += " ORDER BY id ASC"
+    else:
+        select_query += " ORDER BY id DESC"
+
+    # Add pagination
     limit = 10
     offset = page * limit
-    query += " LIMIT ? OFFSET ?"
+    select_query += " LIMIT ? OFFSET ?"
     params.extend([limit, offset])
 
-    result = read_query(query, tuple(params))
-    if result:
-        topics = [gen_topic(row) for row in result]
-        return {"pages": len(topics), "topics":topics}
-    return {"pages": 0, "topics": []}
+    result = read_query(select_query, tuple(params))
+    topics = [gen_topic(row) for row in result] if result else []
+
+    total_pages = total_topics // limit + 1
+
+    return {"pages": total_pages, "topics": topics}
 
 
 def get_replies_by_topic_id(topic_id: int) -> list[Reply]:
