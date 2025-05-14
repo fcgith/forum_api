@@ -65,7 +65,7 @@ async def get_topics_by_category(category_id: int,token: str) -> List[Topic]:
     """
     return CategoryService.get_topics_by_category_id(category_id, token)
 
-@router.post("/{category_id}", response_model=int)
+@router.post("/", response_model=int)
 async def create_category(data: CategoryCreate,token: str) -> int:
     """
     Create a new category with the given details.
