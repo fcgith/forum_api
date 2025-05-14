@@ -69,17 +69,16 @@ async def create_category(data: CategoryCreate,token: str) -> int:
 
 @router.put("/update-hide-status", response_model=bool)
 async def update_hide_status(token: str, data: UpdateHiddenStatus) -> bool:
+    # TODO: docstring
     return CategoryService.update_hidden_status(data.category_id, data.hidden, token)
 
 
 @router.put("/update-user-permissions", response_model=bool)
 async def update_user_permissions(token: str, data: UpdateUserPermission) -> bool:
+    # TODO: docstring
     return CategoryService.update_user_permissions(data.category_id, data.user_id, data.permission, token)
 
 @router.get("/{category_id}/get-users-with-permissions", response_model=dict)
 async def get_users_with_view_or_read_perms(token: str, category_id: int) -> dict:
+    # TODO: docstring
     return UserService.get_users_with_permissions_for_category(category_id, token)
-
-@router.put("/{category_id}/hide")
-async def hide_category(token: str, category_id: int) -> bool: # Obsolete
-    return CategoryService.hide_category_by_id(category_id, token)

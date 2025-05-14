@@ -44,7 +44,5 @@ class AuthService:
     def decode_token_username(cls, token) -> UserPublic | None:
         if AuthToken.validate_expiry(token):
             user = AuthToken.validate(token, public=True)
-            if not user:
-                raise not_found
             return user
         raise invalid_token

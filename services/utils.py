@@ -58,13 +58,13 @@ class AuthToken:
                 if not user:
                     raise access_denied
                 return user
-            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError):
-                return False
-        return False
+            except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
+                print(f"Token validation error: {e}")
+        raise access_denied
 
     @classmethod
-    def validate_admin(cls, token: str) -> None | User:
-        user = cls.validate(token)
-        if user and user.is_admin():
+    def validate_admin(cls, token: str, public: bool = False) -> None | User:
+        user = cls.validate(token, public=public)
+        if user.is_admin():
             return user
         raise access_denied

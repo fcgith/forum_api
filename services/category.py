@@ -4,7 +4,7 @@ from models.category import Category, CategoryCreate
 import repo.category as category_repo
 import repo.topic as topics_repo
 import repo.user as user_repo
-from services.errors import not_found, access_denied, invalid_credentials, bad_request, category_not_found
+from services.errors import not_found, access_denied, bad_request
 from services.utils import AuthToken
 
 
@@ -20,9 +20,8 @@ class CategoryService:
 
     @classmethod
     def get_all_viewable(cls, token: str) -> List[Category]:
+        # TODO: docstring
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_credentials
         return category_repo.get_all_viewable_categories(user)
 
     @classmethod
@@ -35,13 +34,14 @@ class CategoryService:
         :return: Category object or raise 404 if not found.
         """
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_credentials
+
         if not category_repo.check_category_read_permission(category_id, user):
             raise access_denied
+
         category = category_repo.get_category_by_id(category_id)
         if not category:
             raise not_found
+
         return category
 
     @classmethod
@@ -54,14 +54,12 @@ class CategoryService:
         :return: ID of the created category.
         """
         AuthToken.validate_admin(token)
-
         return category_repo.create_category(data)
 
     @classmethod
     def get_topics_by_category_id(cls, category_id: int, token: str):
+        # TODO: docstring
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_credentials
 
         if not category_repo.check_category_read_permission(category_id, user):
             raise access_denied
@@ -70,6 +68,7 @@ class CategoryService:
 
     @classmethod
     def update_hidden_status(cls, category_id: int, hidden: int, token: str):
+        # TODO: docstring
         AuthToken.validate_admin(token)
 
         category = category_repo.get_category_by_id(category_id)
@@ -84,6 +83,7 @@ class CategoryService:
 
     @classmethod
     def update_user_permissions(cls, category_id: int, user_id: int, permission: int, token: str):
+        # TODO: docstring
         AuthToken.validate_admin(token)
 
         category = category_repo.get_category_by_id(category_id)
@@ -93,7 +93,6 @@ class CategoryService:
             raise not_found
 
         if permission not in (0, 1, 2, 3):
-            print(permission)
             raise bad_request
 
         return category_repo.update_permissions(category_id, user_id, permission)

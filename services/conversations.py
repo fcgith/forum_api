@@ -21,15 +21,15 @@ class ConversationsService:
             List of users
         """
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
         conversations = get_conversations_by_user(user.id)
+
         users = []
         for conversation in conversations:
             if conversation.initiator_id == user.id and conversation.receiver_id not in users:
                 users.append(conversation.receiver_id)
             elif conversation.receiver_id ==user.id and conversation.initiator_id not in users:
                 users.append(conversation.initiator_id)
+
         return user_repo.get_users_in_list_by_id(users,True)
 
     @classmethod
@@ -46,11 +46,11 @@ class ConversationsService:
             Dictionary with message ID and status
         """
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
         receiver_user = user_repo.get_user_by_id(receiver_id)
+
         if not receiver_user or receiver_id==user.id:
             raise invalid_credentials
+
         if not conversation_exists(user.id, receiver_id):
             conversation_id = create_conversation(user.id, receiver_id)
         else:
@@ -79,8 +79,6 @@ class ConversationsService:
             List of messages
         """
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
 
         conversation = get_conversation_by_id(conversation_id)
         if not conversation:

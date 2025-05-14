@@ -19,10 +19,8 @@ class TopicsService:
             Dictionary with topic ID and status
         """
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
-
         category = category_repo.get_category_by_id(data.category_id)
+
         if not category:
             raise category_not_found
 
@@ -48,9 +46,6 @@ class TopicsService:
             Topic data
         """
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
-
         topic = topic_repo.get_topic_by_id(topic_id)
 
         if not topic:
@@ -75,8 +70,6 @@ class TopicsService:
             List[Topic]: A list of Topic objects if found, otherwise [].
         """
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
 
         if user.is_admin():
             viewable_category_ids = category_repo.get_all_category_ids()

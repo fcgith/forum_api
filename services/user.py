@@ -17,10 +17,7 @@ class UserService:
 
     @classmethod
     def get_users(cls, token: str, public: bool = False) -> List[User]:
-        user = AuthToken.validate(token, public)
-
-        if not user or not user.is_admin():
-            raise access_denied
+        AuthToken.validate_admin(token, public)
 
         return user_repo.get_all_users()
 

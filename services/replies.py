@@ -26,20 +26,14 @@ class RepliesService:
     @classmethod
     def set_vote(cls, reply_id: int, vote: int, token: str) -> bool:
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
-
         result = replies_repo.set_reply_vote(reply_id, user.id, vote)
-
         return result
 
     @classmethod
     def add_reply(cls, content: str, topic_id: int, token: str) -> int | None:
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
-
         topic = topics_repo.get_topic_by_id(topic_id)
+
         if not topic:
             raise topic_not_found
 
@@ -56,10 +50,8 @@ class RepliesService:
     @classmethod
     def set_best_reply(cls, reply_id: int, topic_id: int, token: str) -> bool:
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
-
         topic = topics_repo.get_topic_by_id(topic_id)
+
         if not topic:
             raise topic_not_found
 
@@ -82,9 +74,6 @@ class RepliesService:
     @classmethod
     def get_topic_replies(cls, topic_id, token) -> List[Reply]:
         user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
-
         topic = topics_repo.get_topic_by_id(topic_id)
 
         if not topic:
