@@ -107,3 +107,18 @@ class CategoryService:
     #         raise category_not_found
     #
     #     return category_repo.hide_category(category_id)
+    @classmethod
+    def get_read_or_write_permission(cls, category_id, token):
+        user = AuthToken.validate(token)
+        perm = category_repo.get_user_category_permission(category_id, user)
+        match perm:
+            case 0:
+                return "no_access"
+            case 1:
+                return "normal_access"
+            case 2:
+                return "read_only_access"
+            case 3:
+                return "write_access"
+            case _:
+                return "no_access"

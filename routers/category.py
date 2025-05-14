@@ -82,3 +82,8 @@ async def update_user_permissions(token: str, data: UpdateUserPermission) -> boo
 async def get_users_with_view_or_read_perms(token: str, category_id: int) -> dict:
     # TODO: docstring
     return UserService.get_users_with_permissions_for_category(category_id, token)
+
+@router.get("{category_id}/check-permission")
+async def check_authenticated_user_category_permission(token: str, category_id: int):
+    # TODO: docstring
+    return {"access_type": CategoryService.get_read_or_write_permission(category_id, token)}
