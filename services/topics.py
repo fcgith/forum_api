@@ -77,7 +77,7 @@ class TopicsService:
         viewable_category_ids = category_repo.get_viewable_category_ids(user)
 
         result = topic_repo.get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
-        pages = len(topics)
+        pages = len(topics) // 10 + 1
         result["pages"] = pages
         return result
 

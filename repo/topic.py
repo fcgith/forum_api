@@ -52,7 +52,7 @@ def get_all_topics() -> dict:
     query = "SELECT * FROM topics"
     result = read_query(query)
     topics = [gen_topic(row) for row in result]
-    pages = len(topics) // 10
+    pages = len(topics) // 10 + 1
     return {"pages": pages, "topics": topics}
 
 def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> dict | None:
