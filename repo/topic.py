@@ -65,7 +65,7 @@ def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_i
 
     page_count = f"SELECT COUNT(*) FROM topics WHERE category_id IN ({placeholder})"
     result = read_query(page_count, tuple(category_ids))
-    pages = sum(result) // 10 + 1 if result else 0
+    pages = sum([row[0] for row in result]) // 10 + 1
 
     if search:
         search = search.replace("+", " ")
