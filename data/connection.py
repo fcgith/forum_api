@@ -40,7 +40,7 @@ def read_query(query: str, params: () = ()) -> List[Tuple] | None:
         try:
             cursor = db.cursor()
             cursor.execute(query, params)
-            return list(cursor)
+            return list(cursor.fetchall())
         except Exception as e:
             print(f"Error executing read query: {e}")
             return None
