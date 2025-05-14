@@ -10,17 +10,18 @@ import repo.category as category_repo
 
 class RepliesService:
 
-    @classmethod
-    def get_reply(cls, reply_id: int, token: str) -> Reply:
-        user = AuthToken.validate(token)
-        if not user:
-            raise invalid_token
-
-        reply = replies_repo.get_reply_by_id(reply_id)
-        if not reply:
-            raise reply_not_found
-
-        return reply
+    # TODO: Not used anywhere
+    # @classmethod
+    # def get_reply(cls, reply_id: int, token: str) -> Reply:
+    #     user = AuthToken.validate(token)
+    #     if not user:
+    #         raise invalid_token
+    #
+    #     reply = replies_repo.get_reply_by_id(reply_id)
+    #     if not reply:
+    #         raise reply_not_found
+    #
+    #     return reply
 
     @classmethod
     def set_vote(cls, reply_id: int, vote: int, token: str) -> bool:
@@ -41,6 +42,9 @@ class RepliesService:
         topic = topics_repo.get_topic_by_id(topic_id)
         if not topic:
             raise topic_not_found
+
+        if not category_repo.check_category_write_permission(topic.category_id, user):
+            raise reply_not_accessible
 
         result = replies_repo.add_reply_to_topic(content, topic_id, user.id)
         if not result:
@@ -85,7 +89,7 @@ class RepliesService:
         if not topic:
             raise topic_not_found
 
-        if not category_repo.is_category_viewable(topic.category_id, user.id):
+        if not category_repo.check_category_read_permission(topic.category_id, user):
             raise reply_not_accessible
 
         replies = replies_repo.get_replies_in_topic(topic_id)

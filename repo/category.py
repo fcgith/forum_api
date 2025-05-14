@@ -25,7 +25,7 @@ def get_all_categories() -> List[Category] | None:
     return []
 
 def get_all_viewable_categories(user: User) -> List[Category]:
-    viewable_ids = get_viewable_category_ids(user.id)
+    viewable_ids = get_viewable_category_ids(user)
     viewable_ids = ", ".join([str(id) for id in viewable_ids])
     query = f"SELECT * FROM categories WHERE id IN ({viewable_ids}) ORDER BY name ASC"
     result = read_query(query)
@@ -44,32 +44,17 @@ def create_category(data: CategoryCreate) -> int | None:
     query = "INSERT INTO categories (name, description) VALUES (?, ?)"
     return insert_query(query, (data.name, data.description))
 
-def get_categories_with_permissions(user_id: int) -> List[Tuple[Category, PermissionTypeEnum]]:
-    query = "SELECT c.id, c.name, c.description, cp.type FROM categories c LEFT JOIN category_permissions cp ON c.id = cp.category_id AND cp.user_id = ?"
-    result = read_query(query, (user_id,))
-    categories = []
-    for row in result:
-        category = Category(id=row[0], name=row[1], description=row[2])
-        permission = PermissionTypeEnum(row[3]) if row[3] is not None else PermissionTypeEnum.NO_PERMISSION
-        categories.append((category, permission))
-    return categories
-
-def get_all_category_ids() -> List[int]:
-    query = "SELECT id FROM categories"
-    return [row[0] for row in read_query(query)]
-
-def get_category_permissions(category_id: int, user_id: int) -> int:
-    query = "SELECT type FROM category_permissions WHERE category_id = ? AND user_id = ?"
-    result = read_query(query, (category_id, user_id))
-
-    return 1 if not result else result[0][0] # 1 = Default
-
-def is_category_viewable(category_id: int, user_id: int) -> bool:
-    perm = get_category_permissions(category_id, user_id)
-    user = user_repo.get_user_by_id(user_id)
-
+def check_category_write_permission(category_id: int, user: User) -> bool:
     if user.is_admin():
         return True
+    perm = get_user_category_permission(category_id, user)
+    return perm >= 3
+
+def check_category_read_permission(category_id: int, user: User) -> bool:
+    if user.is_admin():
+        return True
+
+    perm = get_user_category_permission(category_id, user)
 
     if perm == 0:
         return False # no permission at all
@@ -91,35 +76,39 @@ def is_category_viewable(category_id: int, user_id: int) -> bool:
     else:
         return False
 
-def get_viewable_category_ids(user_id: int) -> List[int]:
+def get_viewable_category_ids(user: User) -> List[int]:
     category_ids = get_all_category_ids()
     return [
         category_id
         for category_id in category_ids
-        if is_category_viewable(category_id, user_id)
+        if check_category_read_permission(category_id, user)
     ]
 
-def set_category_permissions(category_id: int, user_id: int, permission: int) -> bool:
-    query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
-    result = read_query(query, (category_id, user_id))
+# def get_categories_with_permissions(user: User) -> List[dict]:
+#     # TODO: Not used and not really useful
+#     query = "SELECT c.id, c.name, c.description, cp.type FROM categories c LEFT JOIN category_permissions cp ON c.id = cp.category_id AND cp.user_id = ?"
+#     result = read_query(query, (user,))
+#     categories = [{"category": Category(id=row[0], name=row[1], description=row[2]),
+#                    "permission": row[3]}
+#                     for row in result]
+#
+#     return categories
 
-    if not result:
-        query = "INSERT INTO category_permissions (category_id, user_id, type) VALUES (?, ?, ?)"
-        result = insert_query(query, (category_id, user_id, permission))
-    else:
-        query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
-        result = update_query(query, (permission, category_id, user_id))
+def get_all_category_ids() -> List[int]:
+    query = "SELECT id FROM categories"
+    return [row[0] for row in read_query(query)]
 
-    return True if result else False
-
+def get_user_category_permission(category_id: int, user: User) -> int:
+    query = "SELECT type FROM category_permissions WHERE category_id = ? AND user_id = ?"
+    result = read_query(query, (category_id, user.id))
+    return 1 if not result else result[0][0] # 1 = Default
 
 def update_hidden_status(category_id: int, hidden: int) -> bool:
     query = "UPDATE categories SET hidden = ? WHERE id = ?"
     result = update_query(query, (hidden, category_id))
     return True if result else False
 
-
-def update_permissions(category_id, user_id, permission) -> bool:
+def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
     query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
     result = read_query(query, (category_id, user_id))
     if not result:
@@ -128,10 +117,10 @@ def update_permissions(category_id, user_id, permission) -> bool:
     else:
         query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
         result = update_query(query, (permission, category_id, user_id))
-    return True
-
-
-def hide_category(category_id) -> bool:
-    query = "UPDATE categories SET hidden = 1 WHERE id = ?"
-    result = update_query(query, (category_id,))
     return True if result > 0 else False
+
+# def hide_category(category_id) -> bool:
+#     # TODO: duplicate with update_hidden_status
+#     query = "UPDATE categories SET hidden = 1 WHERE id = ?"
+#     result = update_query(query, (category_id,))
+#     return True if result > 0 else False

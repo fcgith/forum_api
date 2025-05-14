@@ -13,4 +13,3 @@ class Reply(BaseModel):
 
 class ReplyCreate(BaseModel):
     content: str
-    topic_id: int

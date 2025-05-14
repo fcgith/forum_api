@@ -27,3 +27,7 @@ async def vote_reply(reply_id: int, vote: int, token: str):
     - A user can change their vote but can only vote once per reply
     """
     return RepliesService.set_vote(reply_id, vote, token)
+
+@router.post("/add/{topic_id}")
+async def add_reply(token: str, topic_id: int, reply: ReplyCreate):
+    return RepliesService.add_reply(reply.content, topic_id, token)

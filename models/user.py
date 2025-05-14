@@ -12,6 +12,7 @@ class User(BaseModel):
     avatar: str | None = None
     admin: int = 0
     creation_date: date
+    special_permissions: dict[int, int] = {}
 
     def is_admin(self):
         return self.admin > 0

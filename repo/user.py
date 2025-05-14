@@ -13,7 +13,8 @@ def gen_user(result: tuple, public: bool = False) -> User | UserPublic:
         birthday=result[4],
         avatar=result[5],
         admin=result[6],
-        creation_date=result[7]
+        creation_date=result[7],
+        special_permissions=get_user_category_permissions(result[0])
     ) if not public else UserPublic(
         id=result[0],
         username=result[1],
@@ -120,4 +121,12 @@ def get_users_with_permissions_for_category(category_id) -> dict:
         for row in result:
             count += 1
             data["users"][count] = {"user": get_user_by_id(row[0]), "permission": row[1]}
+    return data
+
+def get_user_category_permissions(user_id: int) -> dict[int, int]:
+    query = "SELECT category_id, type FROM category_permissions WHERE user_id = ?"
+    result = read_query(query, (user_id,))
+    data = {}
+    if result:
+        data = {row[0]: row[1] for row in result}
     return data

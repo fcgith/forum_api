@@ -1,7 +1,7 @@
 import repo.topic as topic_repo
-from repo.category import get_category_by_id, get_viewable_category_ids, get_all_category_ids,is_category_viewable
-from models.topic import TopicCreate, TopicResponse
-from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found
+import repo.category as category_repo
+from models.topic import TopicCreate
+from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found, internal_error
 from services.utils import AuthToken
 
 
@@ -22,16 +22,16 @@ class TopicsService:
         if not user:
             raise invalid_token
 
-        category = get_category_by_id(data.category_id)
+        category = category_repo.get_category_by_id(data.category_id)
         if not category:
             raise category_not_found
 
-        if not is_category_viewable(data.category_id, user.id):
+        if not category_repo.check_category_write_permission(data.category_id, user):
             raise category_not_accessible
 
         topic_id = topic_repo.create_topic(data, user.id)
         if not topic_id:
-            raise topic_not_found
+            raise internal_error
 
         return {"topic_id": topic_id, "message": "Topic created successfully"}
 
@@ -50,10 +50,12 @@ class TopicsService:
         user = AuthToken.validate(token)
         if not user:
             raise invalid_token
+
         topic = topic_repo.get_topic_by_id(topic_id)
+
         if not topic:
             raise topic_not_found
-        if not is_category_viewable(topic.category_id, user.id) and not user.is_admin():
+        if not category_repo.check_category_read_permission(topic.category_id, user) and not user.is_admin():
             raise category_not_accessible
 
         return topic
@@ -77,14 +79,15 @@ class TopicsService:
             raise invalid_token
 
         if user.is_admin():
-            viewable_category_ids = get_all_category_ids()
+            viewable_category_ids = category_repo.get_all_category_ids()
         else:
-            viewable_category_ids = get_viewable_category_ids(user.id)
+            viewable_category_ids = category_repo.get_viewable_category_ids(user)
 
         return topic_repo.get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
 
     @classmethod
     def lock_topic_by_id(cls, topic_id, token) -> bool:
+        ## TODO: add docstring
         AuthToken.validate_admin(token)
 
         topic = topic_repo.get_topic_by_id(topic_id)

@@ -37,7 +37,7 @@ class CategoryService:
         user = AuthToken.validate(token)
         if not user:
             raise invalid_credentials
-        if not category_repo.is_category_viewable(category_id, user.id):
+        if not category_repo.check_category_read_permission(category_id, user):
             raise access_denied
         category = category_repo.get_category_by_id(category_id)
         if not category:
@@ -63,7 +63,7 @@ class CategoryService:
         if not user:
             raise invalid_credentials
 
-        if not category_repo.is_category_viewable(category_id, user.id):
+        if not category_repo.check_category_read_permission(category_id, user):
             raise access_denied
 
         return topics_repo.get_topics_in_category(category_id)
@@ -98,12 +98,13 @@ class CategoryService:
 
         return category_repo.update_permissions(category_id, user_id, permission)
 
-    @classmethod
-    def hide_category_by_id(cls, category_id, token) -> bool:
-        AuthToken.validate_admin(token)
-
-        category = cls.get_by_id(category_id, token)
-        if not category:
-            raise category_not_found
-
-        return category_repo.hide_category(category_id)
+    # TODO: duplicate function with update_hidden_status
+    # @classmethod
+    # def hide_category_by_id(cls, category_id, token) -> bool:
+    #     AuthToken.validate_admin(token)
+    #
+    #     category = cls.get_by_id(category_id, token)
+    #     if not category:
+    #         raise category_not_found
+    #
+    #     return category_repo.hide_category(category_id)
