@@ -110,6 +110,8 @@ class CategoryService:
     @classmethod
     def get_read_or_write_permission(cls, category_id, token):
         user = AuthToken.validate(token)
+        if user.is_admin():
+            return "write_access"
         perm = category_repo.get_user_category_permission(category_id, user)
         match perm:
             case 0:
