@@ -67,7 +67,7 @@ class TopicsService:
             token: Authentication token for user validation.
 
         Returns:
-            List[Topic]: A list of Topic objects if found, otherwise [].
+            dict[int, List[Topic]]: A list of Topic objects if found.
         """
         user = AuthToken.validate(token)
 
