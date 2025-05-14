@@ -5,7 +5,8 @@ FROM python:3.12.5-slim
 WORKDIR /app
 
 # Install system dependencies for MariaDB Connector/C, git, and procps (for pkill)
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y sudo
+RUN apt-get install -y \
     libmariadb-dev \
     gcc \
     pkg-config \
@@ -33,7 +34,16 @@ COPY . .
 COPY update_and_run.sh .
 
 # Ensure the script has executable permissions
-RUN chmod +x update_and_run.sh
+RUN sudo chmod +x update_and_run.sh
+
+# Set environment variables for database connection and authentication
+ENV DB_HOST=172.245.56.116 \
+    DB_PORT=3600 \
+    DB_USER=root \
+    DB_PASSWORD=root \
+    DB_NAME=forum \
+    ALGORITHM=HS256 \
+    SECRET_KEY=fh8q247ghf0qb8374fhq2847hf0q89734gfh7
 
 # Command to run the update script
 CMD ["./update_and_run.sh"]
