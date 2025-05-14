@@ -50,7 +50,6 @@ def create_topic(data: TopicCreate, user_id: int) -> int | None:
 
 def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> dict | None:
     params=[]
-    pages = 0
     if isinstance(sort, str):
         sort = sort.lower()
     else:
@@ -63,9 +62,6 @@ def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_i
     else:
         query = "SELECT * FROM topics"
 
-    page_count = f"SELECT COUNT(*) FROM topics WHERE category_id IN ({placeholder})"
-    result = read_query(page_count, tuple(category_ids))
-    pages = sum([row[0] for row in result]) // 10 + 1
 
     if search:
         search = search.replace("+", " ")
@@ -87,7 +83,8 @@ def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_i
 
     result = read_query(query, tuple(params))
     if result:
-        return {"pages": pages, "topics":[gen_topic(row) for row in result]}
+        topics = [gen_topic(row) for row in result]
+        return {"pages": len(topics), "topics":topics}
     return {"pages": 0, "topics": []}
 
 
