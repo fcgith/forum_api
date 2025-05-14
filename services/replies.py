@@ -24,8 +24,12 @@ class RepliesService:
     #     return reply
 
     @classmethod
-    def set_vote(cls, reply_id: int, vote: int, token: str) -> bool:
+    def set_vote(cls, reply_id: int, vote: int, token: str) -> dict:
         user = AuthToken.validate(token)
+        reply = replies_repo.get_reply_by_id(reply_id)
+        if not reply:
+            raise reply_not_found
+
         result = replies_repo.set_reply_vote(reply_id, user.id, vote)
         return result
 

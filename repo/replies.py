@@ -16,8 +16,8 @@ def get_reply_by_id(reply_id: int) -> Reply | None:
     result = read_query(query, (reply_id,))
     return gen_reply(result[0]) if result else None
 
-def set_reply_vote(reply_id: int, user_id: int, vote: int) -> bool | None:
-    if vote not in (0, 1):
+def set_reply_vote(reply_id: int, user_id: int, vote: int) -> dict | None:
+    if vote not in (-1, 0, 1):
         vote = 0
 
     query = "SELECT * FROM votes WHERE reply_id = ? AND user_id = ?"
@@ -29,16 +29,13 @@ def set_reply_vote(reply_id: int, user_id: int, vote: int) -> bool | None:
         query = "INSERT INTO votes (reply_id, user_id, type) VALUES (?, ?, ?)"
         result = insert_query(query, (reply_id, user_id, vote))
 
-    return True
+    return {"success": result > 0}
 
 def get_reply_votes(reply_id: int) -> int:
     query = "SELECT type FROM votes WHERE reply_id = ?"
     result = read_query(query, (reply_id,))
     votes = [row[0] for row in result]
-    end_result = 0
-    for vote in votes:
-        end_result += vote if vote == 1 else -1
-    return end_result
+    return sum(votes)
 
 def add_reply_to_topic(content: str, topic_id: int, user_id: int) -> int | None:
     query = "INSERT INTO replies (content, topic_id, user_id) VALUES (?, ?, ?)"
