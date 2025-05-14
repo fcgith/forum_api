@@ -48,6 +48,13 @@ def create_topic(data: TopicCreate, user_id: int) -> int | None:
     result = insert_query(query, (data.name, data.content, data.category_id, user_id))
     return result
 
+def get_all_topics() -> dict:
+    query = "SELECT * FROM topics"
+    result = read_query(query)
+    topics = [gen_topic(row[0]) for row in result]
+    pages = len(topics) // 10
+    return {"pages": pages, "topics": topics}
+
 def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> dict | None:
     params=[]
     if isinstance(sort, str):

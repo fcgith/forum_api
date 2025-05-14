@@ -72,7 +72,7 @@ class TopicsService:
         user = AuthToken.validate(token)
 
         if user.is_admin():
-            viewable_category_ids = category_repo.get_all_category_ids()
+            return topic_repo.get_all_topics()
         else:
             viewable_category_ids = category_repo.get_viewable_category_ids(user)
 
