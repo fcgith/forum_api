@@ -47,34 +47,37 @@ def create_category(data: CategoryCreate) -> int | None:
 def check_category_write_permission(category_id: int, user: User) -> bool:
     if user.is_admin():
         return True
-    perm = get_user_category_permission(category_id, user)
-    return perm >= 3
+
+    category = get_category_by_id(category_id)
+
+    if not category:
+        raise category_not_found
+
+    if category.hidden == 0:
+        return True
+    else:
+        perm = get_user_category_permission(category_id, user)
+        return perm >= 3
 
 def check_category_read_permission(category_id: int, user: User) -> bool:
     if user.is_admin():
         return True
 
-    perm = get_user_category_permission(category_id, user)
+    category = get_category_by_id(category_id)
 
-    if perm == 0:
-        return False # no permission at all
+    if not category:
+        raise category_not_found
 
-    query = "SELECT hidden FROM categories WHERE id = ?"
-    result = read_query(query, (category_id,))
-
-    if result:
-        ctype = result[0][0] # 0 for hidden, 1 for viewable
+    if category.hidden == 0:
+        return True
     else:
-        raise category_not_found # category not found
+        perm = get_user_category_permission(category_id, user)
 
-    if ctype == 1:
-        # hidden category
+        if perm == 0:
+            return False # no permission at all
+
         return perm >= 2
-    elif ctype == 0:
-        # public category
-        return perm >= 1
-    else:
-        return False
+
 
 def get_viewable_category_ids(user: User) -> List[int]:
     category_ids = get_all_category_ids()
