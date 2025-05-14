@@ -12,6 +12,7 @@ class Topic(BaseModel):
     user_id: int
     user_name: str | None = None
     replies_count: int = 0
+    locked: int = 0
 
 
 class TopicCreate(BaseModel):

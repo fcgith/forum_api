@@ -18,7 +18,8 @@ def gen_topic(result: tuple) -> Topic:
         category_name=category_repo.get_category_by_id(result[4]).name,
         user_id=result[5],
         user_name=get_user_by_id(result[5]).username if result[5] else None,
-        replies_count=len(get_replies_by_topic_id(result[0])))
+        replies_count=len(get_replies_by_topic_id(result[0])),
+        locked=result[6])
 
 def get_topic_by_id(topic_id: int) -> Topic | None:
     query = "SELECT * FROM topics WHERE id = ?"

@@ -43,7 +43,8 @@ class RepliesService:
         if not topic:
             raise topic_not_found
 
-        if not category_repo.check_category_write_permission(topic.category_id, user):
+        if not category_repo.check_category_write_permission(topic.category_id, user)\
+                or topic.locked == 1:
             raise reply_not_accessible
 
         result = replies_repo.add_reply_to_topic(content, topic_id, user.id)
