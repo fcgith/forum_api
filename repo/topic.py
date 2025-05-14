@@ -51,7 +51,7 @@ def create_topic(data: TopicCreate, user_id: int) -> int | None:
 def get_all_topics() -> dict:
     query = "SELECT * FROM topics"
     result = read_query(query)
-    topics = [gen_topic(row[0]) for row in result]
+    topics = [gen_topic(row) for row in result]
     pages = len(topics) // 10
     return {"pages": pages, "topics": topics}
 
