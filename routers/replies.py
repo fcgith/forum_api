@@ -6,7 +6,7 @@ from services.replies import RepliesService
 router = APIRouter(tags=["replies"])
 
 
-@router.post("/best")
+@router.put("/best")
 async def select_best_reply(reply_id: int, topic_id: int, token: str):
     """
     Mark a reply as the best answer for a specific topic.
@@ -28,7 +28,7 @@ async def select_best_reply(reply_id: int, topic_id: int, token: str):
     return RepliesService.set_best_reply(reply_id, topic_id, token)
 
 
-@router.post("/vote")
+@router.put("/vote")
 async def vote_reply(reply_id: int, vote: int, token: str):
     """
     Cast a vote (upvote or downvote) on a reply.
