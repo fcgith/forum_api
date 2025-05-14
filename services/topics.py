@@ -70,13 +70,16 @@ class TopicsService:
             dict[int, List[Topic]]: A list of Topic objects if found.
         """
         user = AuthToken.validate(token)
-
         if user.is_admin():
             return topic_repo.get_all_topics()
-        else:
-            viewable_category_ids = category_repo.get_viewable_category_ids(user)
+        topics = topic_repo.get_all_topics()["topics"]
 
-        return topic_repo.get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
+        viewable_category_ids = category_repo.get_viewable_category_ids(user)
+
+        result = topic_repo.get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
+        pages = len(topics)
+        result["pages"] = pages
+        return result
 
     @classmethod
     def lock_topic_by_id(cls, topic_id, token) -> bool:
