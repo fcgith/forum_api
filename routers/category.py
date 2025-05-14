@@ -14,8 +14,15 @@ async def get_all_categories(token: str) -> List[Category]:
     """
     Retrieve a list of all available categories.
 
-    :param token: Authentication token.
-    :return: List of Category objects.
+    Parameters
+    ----------
+    token : str
+        Authentication token.
+
+    Returns
+    -------
+    List[Category]
+        A list of available categories the user can view.
     """
     return CategoryService.get_all_viewable(token)
 
@@ -25,34 +32,36 @@ async def get_category_by_id(category_id: int,token: str) -> Category:
     """
     Retrieve a category by its unique ID.
 
-    :param category_id: The ID of the category.
-    :param token: Authentication token for user validation.
-    :return: Category object.
+    Parameters
+    ----------
+    category_id : int
+        The ID of the category.
+    token : str
+        Authentication token for user validation.
+
+    Returns
+    -------
+    Category
+        The category with the given ID.
     """
     return CategoryService.get_by_id(category_id,token)
 
 @router.get("/{category_id}/topics", response_model=List[Topic])
 async def get_topics_by_category(category_id: int,token: str) -> List[Topic]:
     """
-    Fetch and return a list of topics for a specified category.
+    Retrieve a list of topics associated with a specific category.
 
-    This function interacts with the `CategoryService` to retrieve a list
-    of topics associated with the given category ID. The function expects
-    the requester to provide a valid token for authorization.
+    Parameters
+    ----------
+    category_id : int
+        The ID of the category.
+    token : str
+        Authentication token for user authorization.
 
-    Args:
-        category_id: An integer representing the unique ID of the category
-            for which topics are to be fetched.
-        token: A string containing the authorization token required to
-            access this endpoint.
-
-    Returns:
-        A list of `Topic` objects representing the topics associated
-        with the given category.
-
-    Raises:
-        HTTPException: If an error occurs during validation or if topics
-            for the specified category cannot be retrieved.
+    Returns
+    -------
+    List[Topic]
+        A list of topics under the specified category.
     """
     return CategoryService.get_topics_by_category_id(category_id, token)
 
@@ -61,29 +70,93 @@ async def create_category(data: CategoryCreate,token: str) -> int:
     """
     Create a new category with the given details.
 
-    :param data: Category creation data.
-    :param token: Authentication token for user validation.
-    :return: ID of the created category.
+    Parameters
+    ----------
+    data : CategoryCreate
+        The data required to create a new category.
+    token : str
+        Authentication token for user validation.
+
+    Returns
+    -------
+    int
+        The ID of the newly created category.
     """
     return CategoryService.create(data,token)
 
 @router.put("/update-hide-status", response_model=bool)
 async def update_hide_status(token: str, data: UpdateHiddenStatus) -> bool:
-    # TODO: docstring
+    """
+    Update the visibility (hidden status) of a category.
+
+    Parameters
+    ----------
+    token : str
+        Authentication token.
+    data : UpdateHiddenStatus
+        Data containing the category ID and new hidden status.
+
+    Returns
+    -------
+    bool
+        True if the update was successful, False otherwise.
+    """
     return CategoryService.update_hidden_status(data.category_id, data.hidden, token)
 
 
 @router.put("/update-user-permissions", response_model=bool)
 async def update_user_permissions(token: str, data: UpdateUserPermission) -> bool:
-    # TODO: docstring
+    """
+    Update a user's permission level for a specific category.
+
+    Parameters
+    ----------
+    token : str
+        Authentication token.
+    data : UpdateUserPermission
+        Data containing category ID, user ID, and permission level.
+
+    Returns
+    -------
+    bool
+        True if the update was successful, False otherwise.
+    """
     return CategoryService.update_user_permissions(data.category_id, data.user_id, data.permission, token)
 
 @router.get("/{category_id}/get-users-with-permissions", response_model=dict)
 async def get_users_with_view_or_read_perms(token: str, category_id: int) -> dict:
-    # TODO: docstring
+    """
+    Retrieve users who have view or read permissions for a given category.
+
+    Parameters
+    ----------
+    token : str
+        Authentication token.
+    category_id : int
+        The ID of the category.
+
+    Returns
+    -------
+    dict
+        A dictionary mapping user IDs to their permission levels.
+    """
     return UserService.get_users_with_permissions_for_category(category_id, token)
 
 @router.get("/{category_id}/check-permission")
 async def check_authenticated_user_category_permission(token: str, category_id: int):
-    # TODO: docstring
+    """
+    Check the permission level (read/write) of the authenticated user for a category.
+
+    Parameters
+    ----------
+    token : str
+        Authentication token.
+    category_id : int
+        The ID of the category.
+
+    Returns
+    -------
+    dict
+        A dictionary with the key 'access_type' indicating permission level.
+    """
     return {"access_type": CategoryService.get_read_or_write_permission(category_id, token)}
