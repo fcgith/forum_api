@@ -46,7 +46,7 @@ def get_conversation_by_users(user_id: int, user_2_id: int) -> int | None:
         return result[0][0]
     return None
 def get_conversations_by_user(user_id: int) -> List[Conversation] | None:
-    query = "SELECT * FROM conversations WHERE initiator_id = ? OR receiver_id = ?"
+    query = "SELECT * FROM conversations WHERE initiator_id = ? OR receiver_id = ? ORDER BY id DESC"
     result = read_query(query, (user_id, user_id))
     return [gen_conversation(row) for row in result]
 
