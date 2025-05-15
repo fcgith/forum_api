@@ -19,10 +19,12 @@ conversation_not_found = HTTPException(status_code=402, detail="The conversation
 #category errors
 category_not_found = HTTPException(status_code=402, detail="The category was not found.")
 category_not_accessible = HTTPException(status_code=402, detail="You don't have permission to access this functionality.")
+category_locked = HTTPException(status_code=403, detail="The category is locked.")
 
 #topic errors
 topic_not_found = HTTPException(status_code=402, detail="The topic was not found.")
 topic_not_accessible = HTTPException(status_code=402, detail="You don't have permission to access this functionality.")
+topic_locked = HTTPException(status_code=403, detail="The topic is locked.")
 
 #reply errors
 reply_not_found = HTTPException(status_code=402, detail="The reply was not found.")
