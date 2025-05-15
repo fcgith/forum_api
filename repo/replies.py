@@ -1,5 +1,6 @@
 from data.connection import read_query, update_query, insert_query
 from models.reply import Reply
+from models.user import User
 from repo.user import get_user_by_id
 
 def gen_reply(reply: tuple) -> Reply:
@@ -62,3 +63,12 @@ def get_replies_in_topic(topic_id):
     result = read_query(query, (topic_id,))
     result = [gen_reply(row) for row in result]
     return result
+
+
+def get_user_vote(reply: Reply, user: User):
+    query = "SELECT type FROM votes WHERE reply_id = ? AND user_id = ? LIMIT 1"
+    result = read_query(query, (reply.id, user.id))
+    vote = {"vote_type": 0}
+    if result:
+        vote["vote_type"] = result[0][0]
+    return vote

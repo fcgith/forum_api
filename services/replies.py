@@ -88,3 +88,11 @@ class RepliesService:
 
         replies = replies_repo.get_replies_in_topic(topic_id)
         return replies
+
+    @classmethod
+    def get_vote(cls, reply_id, token):
+        user = AuthToken.validate(token)
+        reply = replies_repo.get_reply_by_id(reply_id)
+        if not reply:
+            raise reply_not_found
+        return replies_repo.get_user_vote(reply, user)
