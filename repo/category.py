@@ -87,16 +87,6 @@ def get_viewable_category_ids(user: User) -> List[int]:
         if check_category_read_permission(category_id, user)
     ]
 
-# def get_categories_with_permissions(user: User) -> List[dict]:
-#     # TODO: Not used and not really useful
-#     query = "SELECT c.id, c.name, c.description, cp.type FROM categories c LEFT JOIN category_permissions cp ON c.id = cp.category_id AND cp.user_id = ?"
-#     result = read_query(query, (user,))
-#     categories = [{"category": Category(id=row[0], name=row[1], description=row[2]),
-#                    "permission": row[3]}
-#                     for row in result]
-#
-#     return categories
-
 def get_all_category_ids() -> List[int]:
     query = "SELECT id FROM categories"
     return [row[0] for row in read_query(query)]
@@ -121,14 +111,3 @@ def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
         query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
         result = update_query(query, (permission, category_id, user_id))
     return True if result > 0 else False
-
-# def hide_category(category_id) -> bool:
-#     # TODO: duplicate with update_hidden_status
-#     query = "UPDATE categories SET hidden = 1 WHERE id = ?"
-#     result = update_query(query, (category_id,))
-#     return True if result > 0 else False
-def get_privileged_users(category_id):
-    query = "SELECT * FROM category_permissions WHERE category_id = ?"
-    result = read_query(query, (category_id,))
-    users = [[row[2], row[3], row[1]] for row in result]
-    return users
