@@ -4,7 +4,7 @@ from typing import Dict
 
 from models.user import User, UserPublic
 from repo.user import get_user_by_username
-from services.errors import access_denied, invalid_token
+from services.errors import access_denied, invalid_token, internal_error
 
 
 class AuthToken:
@@ -44,12 +44,12 @@ class AuthToken:
             decoded = cls.decode(token)
             exp = decoded.get('exp')
             if exp is None or not isinstance(exp, (int, float)):
-                return False
+                raise invalid_token
             current_time = datetime.now(timezone.utc).timestamp()
             return current_time < exp
         except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
             print(f"Token validation error: {str(e)}")
-            return False
+            raise internal_error
 
     @classmethod
     def validate(cls, token: str, public: bool = False) -> User | UserPublic | bool:

@@ -41,7 +41,7 @@ async def register(user_data: UserCreate) -> RegisterResponse:
     return AuthService.register_user(user_data)
 
 @router.get("/")
-async def get_username_by_token(token: str) -> UserPublic | None:
+async def get_user_data_by_token(token: str) -> UserPublic | None:
     """
     Retrieve public user information by decoding a JWT token.
 
