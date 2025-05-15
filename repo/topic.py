@@ -126,7 +126,7 @@ def get_topics_in_category(category_id) -> List[Topic] | []:
     return [gen_topic(row) for row in result] if result else []
 
 
-def lock_topic(topic_id) -> bool:
+def lock_topic(topic_id) -> int:
     query = "UPDATE topics SET locked = 1 WHERE id = ?"
     result = update_query(query, (topic_id,))
-    return True if result > 0 else False
+    return result
