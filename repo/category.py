@@ -14,6 +14,7 @@ def gen_category(result: tuple) -> Category:
         name=result[1],
         description=result[2],
         hidden=result[3],
+        locked=result[4],
         topics_count=topics_repo.get_topics_count_by_category(result[0])
     )
 
