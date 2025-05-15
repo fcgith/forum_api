@@ -158,3 +158,9 @@ def get_users_in_conversation(conversation_id: int):
         raise not_found
     result = result[0]
     return get_users_in_list_by_id([result[0], result[1]])
+
+
+def set_user_avatar(user: User, link: str):
+    query = "UPDATE users SET avatar = ? WHERE id = ?"
+    result = insert_query(query, (link, user.id))
+    return result

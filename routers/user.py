@@ -43,3 +43,7 @@ async def get_user_with_id(user_id: int) -> User | UserPublic:
 @router.get("/get-by-username/{username}")
 def get_by_username(username: str):
     return UserService.get_user_by_username(username, True)
+
+@router.put("/avatar/")
+async def update_avatar(token: str, link: str):
+    return UserService.set_avatar(token, link)

@@ -2,7 +2,7 @@ from typing import List
 
 from models.user import User, UserPublic
 import repo.user as user_repo
-from services.errors import access_denied, not_found
+from services.errors import access_denied, not_found, internal_error
 from services.utils import AuthToken
 
 class UserService:
@@ -33,3 +33,10 @@ class UserService:
             return user
         else:
             raise not_found
+
+    @classmethod
+    def set_avatar(cls, token, link):
+         user = AuthToken.validate(token)
+         if not user_repo.set_user_avatar(user, link):
+             raise internal_error
+         return {"message": "Avatar set successfully"}
