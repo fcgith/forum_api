@@ -28,7 +28,7 @@ async def get_all_conversations(token: str)-> List[UserPublic]:
 async def get_last_message(user_id: int, token: str):
     return ConversationsService.get_last_message(user_id, token)
 
-@router.post("/messages")
+@router.post("/messages/")
 async def send_message(message: MessageCreate, token: str):
     """
     Send a message to another user. Starts a new conversation if one does not exist.
