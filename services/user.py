@@ -22,7 +22,7 @@ class UserService:
         return user_repo.get_all_users()
 
     @classmethod
-    def get_users_with_permissions_for_category(cls, category_id: int, token: str) -> dict:
+    def get_users_with_permissions_for_category(cls, category_id: int, token: str) -> list:
         AuthToken.validate_admin(token)
         return user_repo.get_users_with_permissions_for_category(category_id)
 
