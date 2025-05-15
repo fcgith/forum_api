@@ -67,3 +67,7 @@ async def get_conversation_messages(conversation_id: int, token: str):
         A list of messages in the specified conversation.
     """
     return ConversationsService.get_conversation_messages(conversation_id, token)
+
+@router.get("/msg/{user_id}")
+async def get_messages_beetween(user_id: int, token: str):
+    return ConversationsService.get_messages_between(user_id, token)

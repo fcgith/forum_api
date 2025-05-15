@@ -1,9 +1,7 @@
-from repo.conversation import get_conversation_by_id, create_conversation, \
-    conversation_exists, get_conversations_by_user, get_conversation_by_users
-from repo.message import create_message, get_messages_by_conversation
+import repo.conversation as conversation_repo
+import repo.message as message_repo
 import repo.user  as user_repo
 from models.message import MessageCreate
-from models.conversation import ConversationCreate
 from services.errors import invalid_token, not_found, invalid_token, conversation_not_found, invalid_credentials
 from services.utils import AuthToken
 
@@ -35,7 +33,7 @@ class ConversationsService:
             List of users
         """
         user = AuthToken.validate(token)
-        conversations = get_conversations_by_user(user.id)
+        conversations = conversation_repo.get_conversations_by_user(user.id)
 
         users = []
         for conversation in conversations:
@@ -65,10 +63,10 @@ class ConversationsService:
         if not receiver_user or receiver_id==user.id:
             raise invalid_credentials
 
-        if not conversation_exists(user.id, receiver_id):
-            conversation_id = create_conversation(user.id, receiver_id)
+        if not conversation_repo.conversation_exists(user.id, receiver_id):
+            conversation_id = conversation_repo.create_conversation(user.id, receiver_id)
         else:
-            conversation_id=get_conversation_by_users(user.id,receiver_id)
+            conversation_id=conversation_repo.get_conversation_by_users(user.id,receiver_id)
 
 
         message_data = MessageCreate(
@@ -76,7 +74,7 @@ class ConversationsService:
             receiver_id=receiver_id
         )
 
-        message_id = create_message(message_data,conversation_id,user.id)
+        message_id = message_repo.create_message(message_data,conversation_id,user.id)
         return {"message_id": message_id, "message": "Message sent successfully"}
 
 
@@ -94,12 +92,26 @@ class ConversationsService:
         """
         user = AuthToken.validate(token)
 
-        conversation = get_conversation_by_id(conversation_id)
+        conversation = conversation_repo.get_conversation_by_id(conversation_id)
         if not conversation:
             raise conversation_not_found
 
         if user.id not in ( conversation.initiator_id , conversation.receiver_id):
             raise invalid_credentials
 
-        messages = get_messages_by_conversation(conversation_id)
+        messages = message_repo.get_messages_by_conversation(conversation_id)
+        return messages
+
+    @classmethod
+    def get_messages_between(cls, user_id, token):
+        user1 = AuthToken.validate(token)
+        user2 = user_repo.get_user_by_id(user_id)
+        if not user2:
+            raise not_found
+
+        conversation = conversation_repo.get_conversation_between_users(user1.id, user2.id)
+        if not conversation:
+            raise not_found
+
+        messages = message_repo.get_messages_by_conversation(conversation.id)
         return messages
