@@ -24,6 +24,9 @@ async def get_all_conversations(token: str)-> List[UserPublic]:
     """
     return ConversationsService.get_conversations(token)
 
+@router.get("/last-message/")
+async def get_last_message(user_id: int, token: str):
+    return ConversationsService.get_last_message(user_id, token)
 
 @router.post("/messages")
 async def send_message(message: MessageCreate, token: str):

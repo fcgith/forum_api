@@ -3,6 +3,8 @@ from typing import List
 from models.auth_model import UserCreate
 from models.user import User, UserPublic
 from data.connection import read_query, insert_query
+from services.errors import not_found
+
 
 def gen_user(result: tuple, public: bool = False) -> User | UserPublic:
     return User(
@@ -130,3 +132,29 @@ def get_user_category_permissions(user_id: int) -> dict[int, int]:
     if result:
         data = {row[0]: row[1] for row in result}
     return data
+
+
+def get_last_message_between(user: User, user2: User) -> dict:
+    query = "SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY id DESC LIMIT 1"
+    result = read_query(query, (user.id, user2.id, user2.id, user.id))
+    data = {}
+    if result:
+        result = result[0]
+        data = {
+            "id": result[0],
+            "content": result[1],
+            "date": result[2],
+            "conversation_id": result[3],
+            "sender_id": result[4],
+            "receiver_id": result[5]
+        }
+    return data
+
+
+def get_users_in_conversation(conversation_id: int):
+    query = "SELECT initiator_id, receiver_id FROM conversations WHERE id = ? LIMIT 1"
+    result = read_query(query, (conversation_id,))
+    if not result:
+        raise not_found
+    result = result[0]
+    return get_users_in_list_by_id([result[0], result[1]])

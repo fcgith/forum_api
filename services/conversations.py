@@ -10,6 +10,20 @@ from services.utils import AuthToken
 
 class ConversationsService:
     @classmethod
+    def get_last_message(cls, user_id: int, token: str) -> dict:
+        user = AuthToken.validate(token)
+        user2 = user_repo.get_user_by_id(user_id)
+        if not user2:
+            raise not_found
+
+        last_message = user_repo.get_last_message_between(user, user2)
+
+        if not last_message.get("id"):
+            raise not_found
+
+        return last_message
+
+    @classmethod
     def get_conversations(cls, token: str):
         """
         Get all users with whom the authenticated user has exchanged messages
