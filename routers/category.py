@@ -160,3 +160,22 @@ async def check_authenticated_user_category_permission(token: str, category_id: 
         A dictionary with the key 'access_type' indicating permission level.
     """
     return {"access_type": CategoryService.get_read_or_write_permission(category_id, token)}
+
+@router.get("/{category_id}/view-privileged-users", response_model=list)
+async def view_privileged_users(token: str, category_id: int):
+    """
+    Check the privileged users for a category.
+
+    Parameters
+    ----------
+    token : str
+        Authentication token. (requires admin rights)
+    category_id : int
+        The ID of the category.
+
+    Returns
+    -------
+    dict
+        A dictionary with the privileged users and their access_type.
+    """
+    return CategoryService.get_privileged_users(category_id, token)

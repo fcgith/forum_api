@@ -127,3 +127,8 @@ def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
 #     query = "UPDATE categories SET hidden = 1 WHERE id = ?"
 #     result = update_query(query, (category_id,))
 #     return True if result > 0 else False
+def get_privileged_users(category_id):
+    query = "SELECT * FROM category_permissions WHERE category_id = ?"
+    result = read_query(query, (category_id,))
+    users = [[row[2], row[3], row[1]] for row in result]
+    return users

@@ -124,3 +124,14 @@ class CategoryService:
                 return "write_access"
             case _:
                 return "no_access"
+
+    @classmethod
+    def get_privileged_users(cls, category_id, token):
+        AuthToken.validate_admin(token)
+        data = []
+        privileged = category_repo.get_privileged_users(category_id)
+        for user in privileged:
+            if user[3] > 1:
+                user_data = user_repo.get_user_by_id(user[1])
+                data.append({"user_data": user_data, "access_type": user[3]})
+        return data
