@@ -34,7 +34,7 @@ class RepliesService:
         return result
 
     @classmethod
-    def add_reply(cls, content: str, topic_id: int, token: str) -> int | None:
+    def add_reply(cls, content: str, topic_id: int, token: str) -> dict | None:
         user = AuthToken.validate(token)
         topic = topics_repo.get_topic_by_id(topic_id)
 
@@ -49,7 +49,7 @@ class RepliesService:
         if not result:
             raise internal_error
 
-        return result
+        return {"id":result}
 
     @classmethod
     def set_best_reply(cls, reply_id: int, topic_id: int, token: str) -> bool:
