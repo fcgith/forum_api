@@ -9,7 +9,8 @@ def gen_reply(reply: tuple) -> Reply:
                  topic_id=reply[3],
                  user_id=reply[4],
                  best_reply=reply[5],
-                 user_name=get_user_by_id(reply[4]).username)
+                 user_name=get_user_by_id(reply[4]).username,
+                 likes=get_reply_votes(reply[0]))
 
 def get_reply_by_id(reply_id: int) -> Reply | None:
     query = "SELECT * FROM replies WHERE id = ?"
@@ -35,7 +36,7 @@ def get_reply_votes(reply_id: int) -> int:
     query = "SELECT type FROM votes WHERE reply_id = ?"
     result = read_query(query, (reply_id,))
     votes = [row[0] for row in result]
-    return sum(votes)
+    return sum(votes) if len(votes) > 0 else 0
 
 def add_reply_to_topic(content: str, topic_id: int, user_id: int) -> int | None:
     query = "INSERT INTO replies (content, topic_id, user_id) VALUES (?, ?, ?)"
