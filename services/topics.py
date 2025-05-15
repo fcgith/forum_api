@@ -1,7 +1,8 @@
 import repo.topic as topic_repo
 import repo.category as category_repo
 from models.topic import TopicCreate
-from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found, internal_error
+from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found, internal_error, \
+    category_locked
 from services.utils import AuthToken
 
 
@@ -23,6 +24,8 @@ class TopicsService:
 
         if not category:
             raise category_not_found
+        if category.locked == 1:
+            raise category_locked
 
         if not category_repo.check_category_write_permission(data.category_id, user):
             raise category_not_accessible
@@ -34,7 +37,7 @@ class TopicsService:
         return {"topic_id": topic_id, "message": "Topic created successfully"}
 
     @classmethod
-    def get_topic(cls, topic_id: int,token: str):
+    def get_topic(cls, topic_id: int, token: str):
         """
         Get a topic by ID
 
@@ -56,7 +59,7 @@ class TopicsService:
         return topic
 
     @classmethod
-    def get_topics(cls, token: str, search:str,page:int=0,sort:str="DESC"):
+    def get_topics(cls, token: str, search: str, page: int = 0, sort: str = "DESC"):
         """
         Retrieve a list of topics with optional search, sorting, and pagination.
 

@@ -1,7 +1,8 @@
 from typing import List
 
 from models.reply import Reply
-from services.errors import reply_not_found, reply_not_accessible, invalid_token, internal_error, topic_not_found
+from services.errors import reply_not_found, reply_not_accessible, invalid_token, internal_error, topic_not_found, \
+    topic_locked
 from services.utils import AuthToken
 import repo.replies as replies_repo
 import repo.topic as topics_repo
@@ -40,6 +41,8 @@ class RepliesService:
 
         if not topic:
             raise topic_not_found
+        if topic.locked ==1:
+            raise topic_locked
 
         if not category_repo.check_category_write_permission(topic.category_id, user)\
                 or topic.locked == 1:
