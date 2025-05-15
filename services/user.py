@@ -37,6 +37,7 @@ class UserService:
     @classmethod
     def set_avatar(cls, token, link):
          user = AuthToken.validate(token)
-         if not user_repo.set_user_avatar(user, link):
+         result = user_repo.set_user_avatar(user, link)
+         if not result:
              raise internal_error
          return {"message": "Avatar set successfully"}

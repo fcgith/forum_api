@@ -2,7 +2,7 @@ from typing import List
 
 from models.auth_model import UserCreate
 from models.user import User, UserPublic
-from data.connection import read_query, insert_query
+from data.connection import read_query, insert_query, update_query
 from services.errors import not_found
 
 
@@ -162,5 +162,5 @@ def get_users_in_conversation(conversation_id: int):
 
 def set_user_avatar(user: User, link: str):
     query = "UPDATE users SET avatar = ? WHERE id = ?"
-    result = insert_query(query, (link, user.id))
+    result = update_query(query, (link, user.id))
     return result
