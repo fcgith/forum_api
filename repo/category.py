@@ -112,3 +112,8 @@ def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
         query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
         result = update_query(query, (permission, category_id, user_id))
     return True if result > 0 else False
+
+def update_locked_status(category_id: int) -> int:
+    query = "UPDATE categories SET locked = 1 WHERE id = ?"
+    result = update_query(query, (category_id,))
+    return result

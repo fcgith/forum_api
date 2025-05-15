@@ -4,7 +4,7 @@ from models.category import Category, CategoryCreate
 import repo.category as category_repo
 import repo.topic as topics_repo
 import repo.user as user_repo
-from services.errors import not_found, access_denied, bad_request
+from services.errors import not_found, access_denied, bad_request, category_not_found
 from services.utils import AuthToken
 
 
@@ -124,3 +124,11 @@ class CategoryService:
                 return "write_access"
             case _:
                 return "no_access"
+
+    @classmethod
+    def category_lock(cls, category_id, token):
+        AuthToken.validate_admin(token)
+        category = category_repo.get_category_by_id(category_id)
+        if not category:
+            raise category_not_found
+        return category_repo.update_locked_status(category_id)

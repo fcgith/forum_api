@@ -160,3 +160,7 @@ async def check_authenticated_user_category_permission(token: str, category_id: 
         A dictionary with the key 'access_type' indicating permission level.
     """
     return {"access_type": CategoryService.get_read_or_write_permission(category_id, token)}
+
+@router.put("/{category_id}/lock")
+async def lock_category(token: str, category_id: int):
+    return CategoryService.category_lock(category_id, token)
