@@ -27,7 +27,8 @@ class UserService:
         return user_repo.get_users_with_permissions_for_category(category_id)
 
     @classmethod
-    def get_user_by_username(cls, username: str, public: bool = False):
+    def get_user_by_username(cls, username: str, token: str, public: bool = False):
+        AuthToken.validate(token)
         user = user_repo.get_user_by_username(username, public)
         if user:
             return user

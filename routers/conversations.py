@@ -26,6 +26,21 @@ async def get_all_conversations(token: str)-> List[UserPublic]:
 
 @router.get("/last-message/{user_id}")
 async def get_last_message(user_id: int, token: str):
+    """
+    Gets the last message in the conversation between a user and authenticated user.
+
+    Parameters
+    ----------
+    user_id : User ID
+        Contains the ID of the unauthenticated user.
+    token : str
+        Authentication token
+
+    Returns
+    -------
+    dict
+        Last message details.
+    """
     return ConversationsService.get_last_message(user_id, token)
 
 @router.post("/messages/")
@@ -70,4 +85,19 @@ async def get_conversation_messages(conversation_id: int, token: str):
 
 @router.get("/msg/{user_id}")
 async def get_messages_beetween(user_id: int, token: str):
+    """
+    Gets the messages between two users with user ID and authentication token.
+
+    Parameters
+    ----------
+    user_id : second user ID
+        Contains the receiver's ID and message content.
+    token : str
+        Authentication token of first user.
+
+    Returns
+    -------
+    dict
+        Returns a dict of messages between the two users.
+    """
     return ConversationsService.get_messages_between(user_id, token)

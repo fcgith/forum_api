@@ -51,6 +51,21 @@ async def vote_reply(reply_id: int, vote: int, token: str):
 
 @router.get("/vote/{reply_id}")
 async def get_user_reply_vote(reply_id: int, token: str):
+    """
+    Get the vote of a user on a given reply.
+
+    Parameters
+    ----------
+    reply_id : int
+        The ID of the reply voted on.
+    token : str
+        Authentication token of the voting user.
+
+    Returns
+    -------
+    dict
+        The vote of the user if any else 0 for no vote
+    """
     return RepliesService.get_vote(reply_id, token)
 
 @router.post("/add/{topic_id}")
