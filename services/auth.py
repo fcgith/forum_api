@@ -39,10 +39,3 @@ class AuthService:
         # Insert the user into the database
         created_id = user_db.insert_user(data)
         return RegisterResponse(message=f"User {created_id} created successfully")
-
-    @classmethod
-    def decode_token_username(cls, token) -> UserPublic | None:
-        if AuthToken.validate_expiry(token):
-            user = AuthToken.validate(token, public=True)
-            return user
-        raise invalid_token

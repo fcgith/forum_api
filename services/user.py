@@ -2,7 +2,7 @@ from typing import List
 
 from models.user import User, UserPublic
 import repo.user as user_repo
-from services.errors import access_denied, not_found, internal_error, user_not_found
+from services.errors import access_denied, not_found, internal_error, user_not_found, invalid_token
 from services.utils import AuthToken
 
 
@@ -41,3 +41,10 @@ class UserService:
         user = AuthToken.validate(token)
         result = user_repo.set_user_avatar(user, link)
         return result
+
+    @classmethod
+    def get_user_by_token(cls, token, public: bool = True):
+        if AuthToken.validate_expiry(token):
+            user = AuthToken.validate(token, public=public)
+            return user
+        raise invalid_token

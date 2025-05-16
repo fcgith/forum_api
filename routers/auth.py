@@ -1,9 +1,5 @@
-from fastapi import Header
-
-import mariadb
 from fastapi import APIRouter
 from models.auth_model import UserLogin, LoginResponse, RegisterResponse, UserCreate
-from models.user import UserPublic
 from services.auth import AuthService
 
 router = APIRouter(tags=["auth"])
@@ -43,22 +39,3 @@ async def register(user_data: UserCreate) -> RegisterResponse:
         A response indicating the result and status of the registration process.
     """
     return AuthService.register_user(user_data)
-
-
-@router.get("/", response_model=UserPublic)
-async def get_user_data_by_token \
-                (token: str = Header(..., alias="Authorization")):
-    """
-    Retrieve public user information by decoding a JWT token.
-
-    Parameters
-    ----------
-    token : str
-        Header Authorization token
-
-    Returns
-    -------
-    UserPublic
-        The public user information if the token is valid.
-    """
-    return AuthService.decode_token_username(token)

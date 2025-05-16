@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 from models.user import User, UserPublic
 from services.user import UserService
 
@@ -23,6 +23,25 @@ async def get_all_users(token: str) -> List[User]:
     """
     users = UserService.get_users(token)
     return users
+
+
+@router.get("/me")
+async def get_user_by_token \
+                (token: str = Header(..., alias="Authorization")) -> UserPublic:
+    """
+    Retrieve public user information by decoding the authenticated user's JWT token.
+
+    Parameters
+    ----------
+    token : str
+        Header Authorization token
+
+    Returns
+    -------
+    UserPublic
+        The public user information if the token is valid.
+    """
+    return UserService.get_user_by_token(token, True)
 
 
 @router.get("/{user_id}")

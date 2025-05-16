@@ -38,7 +38,6 @@ class AuthToken:
 
     @classmethod
     def validate_expiry(cls, token: str) -> bool:
-        ## TODO: docstring
         try:
             decoded = cls.decode(token)
             exp = decoded.get('exp')
@@ -48,11 +47,13 @@ class AuthToken:
             return current_time < exp
         except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
             print(f"Token validation error: {str(e)}")
-            raise internal_error
+            raise invalid_token
 
     @classmethod
     def validate(cls, token: str, public: bool = False) -> User | UserPublic | bool:
-        ## TODO: docstring
+        """
+        Returns user data if the token is valid or raises an error.
+        """
         valid_date = cls.validate_expiry(token)
         if valid_date:
             try:
@@ -63,6 +64,7 @@ class AuthToken:
                 return user
             except (jwt.ExpiredSignatureError, jwt.InvalidTokenError) as e:
                 print(f"Token validation error: {e}")
+                raise invalid_token
         raise access_denied
 
     @classmethod
