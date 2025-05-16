@@ -54,7 +54,7 @@ async def get_user_data_by_token \
     Parameters
     ----------
     token : str
-        A JWT token used to identify and authenticate the user.
+        Header Authorization token
 
     Returns
     -------
