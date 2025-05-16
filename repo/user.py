@@ -1,6 +1,7 @@
 from typing import List
 
 from models.auth_model import UserCreate
+from models.category import PrivilegedUser
 from models.user import User, UserPublic
 from data.connection import read_query, insert_query, update_query
 from services.errors import not_found
@@ -37,7 +38,7 @@ def get_all_users() -> List[User] | None:
     return users
 
 
-def get_user_by_id(user_id: int, public: bool = False, tup=False) -> User | tuple | None:
+def get_user_by_id(user_id: int, public: bool = False, tup=False) -> User | UserPublic | tuple | None:
     """
     Returns User if such exists by id or UserPublic if such is requested via service
     :param user_id: int user id
@@ -126,7 +127,7 @@ def get_users_with_permissions_for_category(category_id) -> list[dict]:
     data = []
     if result:
         for row in result:
-            data.append({"user": get_user_by_id(row[0], True), "permission": row[1]})
+            data.append(PrivilegedUser(user=get_user_by_id(row[0], True), permission=row[1]))
     return data
 
 
