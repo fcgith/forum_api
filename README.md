@@ -84,12 +84,12 @@ docker run -p 8000:8000 forum-api
 ## 🔗 API Endpoints Overview
 
 ### **Authentication**
-- `POST /auth/login` — User login (JWT)
+- `POST /auth/login` — User login (PyJWT)
 - `POST /auth/register` — User registration
-- `GET /auth/` — Get user info by token
 
 ### **Users**
 - `GET /users/` — List all users (admin)
+- `GET /users/me` — Public user data of authenticated user
 - `GET /users/{user_id}` — Get user by ID
 - `GET /users/search/{username}` — Search user by username
 - `PUT /users/avatar/` — Update user avatar

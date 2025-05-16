@@ -25,7 +25,7 @@ async def get_all_users(token: str) -> List[User]:
     return users
 
 
-@router.get("/me")
+@router.get("/me", response_model=UserPublic)
 async def get_user_by_token \
                 (token: str = Header(..., alias="Authorization")) -> UserPublic:
     """
@@ -39,7 +39,7 @@ async def get_user_by_token \
     Returns
     -------
     UserPublic
-        The public user information if the token is valid.
+        The public user data if the token is valid.
     """
     return UserService.get_user_by_token(token, True)
 
