@@ -1,6 +1,7 @@
 from typing import Optional
 from pydantic import BaseModel
 from models.category_permission import PermissionTypeEnum
+from models.user import UserPublic
 
 
 class Category(BaseModel):
@@ -31,3 +32,7 @@ class UpdateUserPermission(BaseModel):
     category_id: int
     user_id: int
     permission: int = 1
+
+class PrivilegedUser(BaseModel):
+    user: UserPublic
+    permission: int

@@ -120,13 +120,13 @@ def get_users_in_list_by_id(lst: List[int], public: bool = False) -> List[User] 
     return [get_user_by_id(user_id, public) for user_id in lst]
 
 
-def get_users_with_permissions_for_category(category_id) -> list:
-    query = "SELECT user_id, type FROM category_permissions WHERE category_id = ? AND type > 1"
+def get_users_with_permissions_for_category(category_id) -> list[dict]:
+    query = "SELECT user_id, type FROM category_permissions WHERE category_id = ? AND (type > 1 OR type < 1)"
     result = read_query(query, (category_id,))
     data = []
     if result:
         for row in result:
-            data.append({"user": get_user_by_id(row[0]), "permission": row[1]})
+            data.append({"user": get_user_by_id(row[0], True), "permission": row[1]})
     return data
 
 

@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, Header
 
-from models.category import Category, CategoryCreate, UpdateHiddenStatus, UpdateUserPermission
+from models.category import Category, CategoryCreate, UpdateHiddenStatus, UpdateUserPermission, PrivilegedUser
 from models.topic import Topic
 from services.category import CategoryService
 from services.user import UserService
@@ -130,22 +130,23 @@ async def update_user_permissions(data: UpdateUserPermission,
         (data.category_id, data.user_id, data.permission, token)
 
 
-@router.get("/{category_id}/get-users-with-permissions", response_model=list)
-async def get_users_with_view_or_read_perms(token: str, category_id: int) -> list:
+@router.get("/{category_id}/privileged-users", response_model=List[PrivilegedUser])
+async def get_users_with_view_or_read_perms(category_id: int,
+                                            token: str = Header(..., alias="Authorization")) -> List[PrivilegedUser]:
     """
-    Retrieve users who have view or read permissions for a given category.
+    Retrieve users who have read or write permissions for a given category.
 
     Parameters
     ----------
     token : str
-        Authentication token.
+        Header Authentication token.
     category_id : int
         The ID of the category.
 
     Returns
     -------
-    dict
-        A dictionary mapping user IDs to their permission levels.
+    List
+        A list of dictionaries mapping privileged public users' data and their permission levels.
     """
     return UserService.get_users_with_permissions_for_category(category_id, token)
 

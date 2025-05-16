@@ -101,7 +101,7 @@ docker run -p 8000:8000 forum-api
 - `POST /categories/add` — Create category
 - `PUT /categories/hide-status` — Hide/unhide category
 - `PUT /categories/user-permissions` — Update user permissions
-- `GET /categories/{category_id}/get-users-with-permissions` — List users with permissions
+- `GET /categories/{category_id}/privileged-users` — List of users and their permission level
 - `GET /categories/{category_id}/check-permission` — Check user permission
 - `PUT /categories/{category_id}/lock` — Lock category
 
