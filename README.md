@@ -37,7 +37,7 @@ A robust RESTful API backend for a modern forum system, built with **FastAPI** a
 - **FastAPI** (Python 3.10+)
 - **MariaDB** (or MySQL)
 - **Pydantic** (data validation)
-- **JWT** (authentication)
+- **PyJWT** (authentication)
 - **Uvicorn** (ASGI server)
 - **Docker** (optional, for deployment)
 
@@ -54,7 +54,7 @@ A robust RESTful API backend for a modern forum system, built with **FastAPI** a
 2. **Set up a virtual environment**
    ```sh
    python -m venv venv
-   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   venv\Scripts\activate
    ```
 
 3. **Install dependencies**
@@ -67,7 +67,7 @@ A robust RESTful API backend for a modern forum system, built with **FastAPI** a
 
 5. **Run the application**
    ```sh
-   uvicorn main:app --reload
+   python main.py
    ```
 
 ---
@@ -75,7 +75,7 @@ A robust RESTful API backend for a modern forum system, built with **FastAPI** a
 ## 🐳 Docker Deployment
 
 ```sh
-docker build -t forum-api .
+docker build -t forum-api . 
 docker run -p 8000:8000 forum-api
 ```
 
@@ -163,5 +163,5 @@ forum_api/
 
 ## 🔗 Links
 
-- [Frontend Repository](https://github.com/fcgith/forum_api_front_end)
+
 - [Live Demo](http://172.245.56.116:8080/)
