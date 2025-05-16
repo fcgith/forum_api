@@ -11,6 +11,7 @@ from routers.conversations import router as conversation_router
 from routers.topics import router as topics_router
 from routers.category import router as category_router
 from routers.replies import router as replies_router
+
 app = FastAPI()
 
 # routers go here
@@ -26,13 +27,14 @@ app.include_router(replies_router, prefix="/replies")
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request, exc: RequestValidationError):
     errors: List[str] = [error["msg"].replace("Value error,", "Invalid data:") for error in exc.errors()]
-    return JSONResponse\
-    (
-        status_code=HTTP_400_BAD_REQUEST,
-        content={"detail": "<br />".join(errors)}
-    )
+    return JSONResponse \
+            (
+            status_code=HTTP_400_BAD_REQUEST,
+            content={"detail": "<br />".join(errors)}
+        )
 
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
