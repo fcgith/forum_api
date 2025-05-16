@@ -146,7 +146,7 @@ async def get_users_with_view_or_read_perms(category_id: int,
     Returns
     -------
     List
-        A list of dictionaries mapping privileged public users' data and their permission levels.
+        A list of dictionaries mapping privileged users' data and their permission levels.
     """
     return UserService.get_users_with_permissions_for_category(category_id, token)
 

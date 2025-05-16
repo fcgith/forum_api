@@ -1,5 +1,6 @@
 from typing import List
 
+from models.category import PrivilegedUser
 from models.user import User, UserPublic
 import repo.user as user_repo
 from services.errors import access_denied, not_found, internal_error, user_not_found, invalid_token
@@ -23,7 +24,7 @@ class UserService:
         return user_repo.get_all_users()
 
     @classmethod
-    def get_users_with_permissions_for_category(cls, category_id: int, token: str) -> list:
+    def get_users_with_permissions_for_category(cls, category_id: int, token: str) -> list[PrivilegedUser]:
         AuthToken.validate_admin(token)
         return user_repo.get_users_with_permissions_for_category(category_id)
 
