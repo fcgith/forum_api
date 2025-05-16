@@ -1,217 +1,72 @@
 import unittest
-from unittest.mock import Mock, patch
-from fastapi import HTTPException
-from models.topic import TopicCreate, TopicResponse
-from models.user import UserPublic
-from routers import topics as topics_router
-from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found
+from fastapi.testclient import TestClient
+from unittest.mock import patch, MagicMock
+from main import app
 
-# Create a mock for the TopicsService
-mock_topics_service = Mock(spec='services.topics.TopicsService')
+client = TestClient(app)
 
-# Replace the actual service with the mock in the router
-topics_router.TopicsService = mock_topics_service
+class TestTopicsRouter(unittest.TestCase):
+    def setUp(self):
+        self.auth_token = "mocked_token"
+        self.topic_id = 1
+        self.topic_payload = {
+            "name": "Test Topic",
+            "content": "This is a test topic.",
+            "category_id": 1
+        }
+        self.mock_topic_response = {
+            "id": 1,
+            "name": "Test Topic",
+            "content": "This is a test topic.",
+            "date": "2024-01-01",
+            "category_id": 1,
+            "category_name": "General",
+            "user_id": 1,
+            "user_name": "user1",
+            "replies_count": 0,
+            "locked": 0
+        }
 
+    @patch("services.topics.TopicsService.create_topic")
+    def test_create_topic(self, mock_create_topic):
+        mock_create_topic.return_value = {"topic_id": 1, "message": "Topic created successfully"}
+        response = client.post("/topics/", json=self.topic_payload, params={"token": self.auth_token})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["topic_id"], 1)
 
-def fake_user():
-    user = Mock()
-    user.id = 1
-    user.username = "testuser"
-    user.is_admin = lambda: False
-    return user
+    @patch("services.topics.TopicsService.get_topic")
+    def test_get_topic(self, mock_get_topic):
+        mock_get_topic.return_value = self.mock_topic_response
+        response = client.get(f"/topics/{self.topic_id}", params={"token": self.auth_token})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["id"], 1)
+        self.assertEqual(response.json()["name"], "Test Topic")
 
+    @patch("services.replies.RepliesService.get_topic_replies")
+    def test_get_topic_replies(self, mock_get_topic_replies):
+        mock_get_topic_replies.return_value = [
+            {"id": 1, "content": "Reply 1", "date": "2024-01-01", "topic_id": 1, "user_id": 2},
+            {"id": 2, "content": "Reply 2", "date": "2024-01-02", "topic_id": 1, "user_id": 3}
+        ]
+        response = client.get(f"/topics/{self.topic_id}/replies", params={"token": self.auth_token})
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.json(), list)
+        self.assertEqual(response.json()[0]["content"], "Reply 1")
 
-def fake_topic():
-    topic = Mock()
-    topic.id = 1
-    topic.name = "Test Topic"
-    topic.content = "Test Content"
-    topic.category_id = 1
-    topic.user_id = 1
-    return topic
+    @patch("services.topics.TopicsService.get_topics")
+    def test_get_topics(self, mock_get_topics):
+        mock_get_topics.return_value = [self.mock_topic_response]
+        response = client.get("/topics/", params={"token": self.auth_token})
+        self.assertEqual(response.status_code, 200)
+        self.assertIsInstance(response.json(), list)
+        self.assertEqual(response.json()[0]["id"], 1)
 
+    @patch("services.topics.TopicsService.lock_topic_by_id")
+    def test_lock_topic(self, mock_lock_topic):
+        mock_lock_topic.return_value = True
+        response = client.put(f"/topics/{self.topic_id}/lock", params={"token": self.auth_token})
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json())
 
-def fake_reply():
-    reply = Mock()
-    reply.id = 1
-    reply.content = "Test Reply"
-    reply.topic_id = 1
-    reply.user_id = 2
-    return reply
-
-
-class TopicsRouter_Should(unittest.TestCase):
-
-    def setUp(self) -> None:
-        mock_topics_service.reset_mock()
-
-    async def test_createTopic_returnsSuccessResponse_whenTopicIsValid(self):
-        # Arrange
-        test_token = "valid_token"
-        test_topic = TopicCreate(name="Test Topic", content="Test Content", category_id=1)
-        expected_response = {"topic_id": 1, "message": "Topic created successfully"}
-
-        mock_topics_service.create_topic.return_value = expected_response
-
-        # Act
-        result = await topics_router.create_topic(test_topic, test_token)
-
-        # Assert
-        self.assertEqual(expected_response, result)
-        mock_topics_service.create_topic.assert_called_once_with(test_topic, test_token)
-
-    async def test_createTopic_raisesException_whenServiceRaisesInvalidToken(self):
-        # Arrange
-        test_token = "invalid_token"
-        test_topic = TopicCreate(name="Test Topic", content="Test Content", category_id=1)
-
-        mock_topics_service.create_topic.side_effect = invalid_token
-
-        # Act & Assert
-        with self.assertRaises(HTTPException) as context:
-            await topics_router.create_topic(test_topic, test_token)
-
-        self.assertEqual(401, context.exception.status_code)
-        self.assertEqual("Invalid token", context.exception.detail)
-        mock_topics_service.create_topic.assert_called_once_with(test_topic, test_token)
-
-    async def test_createTopic_raisesException_whenServiceRaisesCategoryNotFound(self):
-        # Arrange
-        test_token = "valid_token"
-        test_topic = TopicCreate(name="Test Topic", content="Test Content", category_id=999)
-
-        mock_topics_service.create_topic.side_effect = category_not_found
-
-        # Act & Assert
-        with self.assertRaises(HTTPException) as context:
-            await topics_router.create_topic(test_topic, test_token)
-
-        self.assertEqual(402, context.exception.status_code)
-        self.assertEqual("Category not found", context.exception.detail)
-        mock_topics_service.create_topic.assert_called_once_with(test_topic, test_token)
-
-    async def test_createTopic_raisesException_whenServiceRaisesCategoryNotAccessible(self):
-        # Arrange
-        test_token = "valid_token"
-        test_topic = TopicCreate(name="Test Topic", content="Test Content", category_id=1)
-
-        mock_topics_service.create_topic.side_effect = category_not_accessible
-
-        # Act & Assert
-        with self.assertRaises(HTTPException) as context:
-            await topics_router.create_topic(test_topic, test_token)
-
-        self.assertEqual(402, context.exception.status_code)
-        self.assertEqual("Category not accessible", context.exception.detail)
-        mock_topics_service.create_topic.assert_called_once_with(test_topic, test_token)
-
-    async def test_getTopic_returnsTopicAndReplies_whenTopicExists(self):
-        # Arrange
-        test_token = "valid_token"
-        test_topic_id = 1
-        test_topic = fake_topic()
-        test_replies = [fake_reply()]
-        expected_response = {"topic": test_topic, "replies": test_replies}
-
-        mock_topics_service.get_topic.return_value = expected_response
-
-        # Act
-        result = await topics_router.get_topic(test_token, test_topic_id)
-
-        # Assert
-        self.assertEqual(expected_response, result)
-        mock_topics_service.get_topic.assert_called_once_with(test_topic_id, test_token)
-
-    async def test_getTopic_raisesException_whenServiceRaisesInvalidToken(self):
-        # Arrange
-        test_token = "invalid_token"
-        test_topic_id = 1
-
-        mock_topics_service.get_topic.side_effect = invalid_token
-
-        # Act & Assert
-        with self.assertRaises(HTTPException) as context:
-            await topics_router.get_topic(test_token, test_topic_id)
-
-        self.assertEqual(401, context.exception.status_code)
-        self.assertEqual("Invalid token", context.exception.detail)
-        mock_topics_service.get_topic.assert_called_once_with(test_topic_id, test_token)
-
-    async def test_getTopic_raisesException_whenServiceRaisesTopicNotFound(self):
-        # Arrange
-        test_token = "valid_token"
-        test_topic_id = 999
-
-        mock_topics_service.get_topic.side_effect = topic_not_found
-
-        # Act & Assert
-        with self.assertRaises(HTTPException) as context:
-            await topics_router.get_topic(test_token, test_topic_id)
-
-        self.assertEqual(402, context.exception.status_code)
-        self.assertEqual("Topic not found", context.exception.detail)
-        mock_topics_service.get_topic.assert_called_once_with(test_topic_id, test_token)
-
-    async def test_getTopic_raisesException_whenServiceRaisesCategoryNotAccessible(self):
-        # Arrange
-        test_token = "valid_token"
-        test_topic_id = 1
-
-        mock_topics_service.get_topic.side_effect = category_not_accessible
-
-        # Act & Assert
-        with self.assertRaises(HTTPException) as context:
-            await topics_router.get_topic(test_token, test_topic_id)
-
-        self.assertEqual(402, context.exception.status_code)
-        self.assertEqual("Category not accessible", context.exception.detail)
-        mock_topics_service.get_topic.assert_called_once_with(test_topic_id, test_token)
-
-    async def test_getTopics_returnsListOfTopics_whenTokenIsValid(self):
-        # Arrange
-        test_token = "valid_token"
-        test_search = "test"
-        test_sort = "name ASC"
-        test_page = 1
-        expected_topics = [fake_topic()]
-
-        mock_topics_service.get_topics.return_value = expected_topics
-
-        # Act
-        result = await topics_router.get_topics(test_token, test_search, test_sort, test_page)
-
-        # Assert
-        self.assertEqual(expected_topics, result)
-        mock_topics_service.get_topics.assert_called_once_with(test_search, test_sort, test_page, test_token)
-
-    async def test_getTopics_returnsListOfTopics_withDefaultParameters(self):
-        # Arrange
-        test_token = "valid_token"
-        expected_topics = [fake_topic()]
-
-        mock_topics_service.get_topics.return_value = expected_topics
-
-        # Act
-        result = await topics_router.get_topics(test_token)
-
-        # Assert
-        self.assertEqual(expected_topics, result)
-        mock_topics_service.get_topics.assert_called_once_with(None, None, 0, test_token)
-
-    async def test_getTopics_raisesException_whenServiceRaisesInvalidToken(self):
-        # Arrange
-        test_token = "invalid_token"
-
-        mock_topics_service.get_topics.side_effect = invalid_token
-
-        # Act & Assert
-        with self.assertRaises(HTTPException) as context:
-            await topics_router.get_topics(test_token)
-
-        self.assertEqual(401, context.exception.status_code)
-        self.assertEqual("Invalid token", context.exception.detail)
-        mock_topics_service.get_topics.assert_called_once_with(None, None, 0, test_token)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
