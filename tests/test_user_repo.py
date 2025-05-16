@@ -10,6 +10,9 @@ from repo.user import get_all_users, get_user_by_id, get_user_by_username, get_u
 class TestUserRepo(unittest.TestCase):
     def setUp(self):
         # Sample user data for testing
+        patcher = patch('repo.user.get_user_category_permissions', return_value={})
+        self.addCleanup(patcher.stop)
+        self.mock_get_perms = patcher.start()
         self.sample_user_tuple = (
             1,
             "testuser",
