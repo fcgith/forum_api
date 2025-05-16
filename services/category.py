@@ -67,14 +67,16 @@ class CategoryService:
         return topics_repo.get_topics_in_category(category_id)
 
     @classmethod
-    def update_hidden_status(cls, category_id: int, hidden: int, token: str):
-        # TODO: docstring
+    def update_hidden_status(cls, category_id: int, hidden: int, token: str) -> dict:
+        """
+        Changes category hidden status if the user is admin or raises an error.
+        """
         AuthToken.validate_admin(token)
 
         category = category_repo.get_category_by_id(category_id)
 
         if not category:
-            raise not_found
+            raise category_not_found
 
         if hidden not in (0, 1):
             raise bad_request

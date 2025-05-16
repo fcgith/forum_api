@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, Query, Body, Form, Path
+from fastapi import APIRouter, Header
 
 from models.category import Category, CategoryCreate, UpdateHiddenStatus, UpdateUserPermission
 from models.topic import Topic
@@ -87,22 +87,23 @@ async def create_category(data: CategoryCreate, token: str) -> int:
     return CategoryService.create(data, token)
 
 
-@router.put("/update-hide-status", response_model=bool)
-async def update_hide_status(token: str, data: UpdateHiddenStatus) -> bool:
+@router.put("/hide-status", response_model=dict)
+async def update_hide_status(data: UpdateHiddenStatus,
+                             token: str = Header(..., alias="Authorization")) -> dict:
     """
     Update the visibility (hidden status) of a category.
 
     Parameters
     ----------
     token : str
-        Authentication token.
+        Header authentication token.
     data : UpdateHiddenStatus
         Data containing the category ID and new hidden status.
 
     Returns
     -------
-    bool
-        True if the update was successful, False otherwise.
+    dict
+        Message indicating that the update was successful.
     """
     return CategoryService.update_hidden_status(data.category_id, data.hidden, token)
 
