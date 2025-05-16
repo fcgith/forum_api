@@ -17,4 +17,4 @@ class ReplyCreate(BaseModel):
     content: str
 
 class ReplyVote(BaseModel):
-    vote: int
+    vote_type: int

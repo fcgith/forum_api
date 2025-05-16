@@ -47,7 +47,7 @@ async def vote_reply(reply_id: int, vote: ReplyVote, token: str):
     dict
         A response indicating the result of the vote operation.
     """
-    return RepliesService.set_vote(reply_id, vote.vote, token)
+    return RepliesService.set_vote(reply_id, vote.vote_type, token)
 
 
 @router.get("/vote/{reply_id}")
