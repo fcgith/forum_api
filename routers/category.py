@@ -108,8 +108,9 @@ async def update_hide_status(data: UpdateHiddenStatus,
     return CategoryService.update_hidden_status(data.category_id, data.hidden, token)
 
 
-@router.put("/update-user-permissions", response_model=bool)
-async def update_user_permissions(token: str, data: UpdateUserPermission) -> bool:
+@router.put("/update-user-permissions", response_model=dict)
+async def update_user_permissions(data: UpdateUserPermission,
+                                  token: str = Header(..., alias="Authorization")) -> dict:
     """
     Update a user's permission level for a specific category.
 
@@ -122,10 +123,11 @@ async def update_user_permissions(token: str, data: UpdateUserPermission) -> boo
 
     Returns
     -------
-    bool
-        True if the update was successful, False otherwise.
+    dict
+        Message indicating that the update was successful.
     """
-    return CategoryService.update_user_permissions(data.category_id, data.user_id, data.permission, token)
+    return CategoryService.update_user_permissions\
+        (data.category_id, data.user_id, data.permission, token)
 
 
 @router.get("/{category_id}/get-users-with-permissions", response_model=list)

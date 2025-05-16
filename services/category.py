@@ -4,7 +4,7 @@ from models.category import Category, CategoryCreate
 import repo.category as category_repo
 import repo.topic as topics_repo
 import repo.user as user_repo
-from services.errors import not_found, access_denied, bad_request, category_not_found
+from services.errors import not_found, access_denied, bad_request, category_not_found, user_not_found
 from services.utils import AuthToken
 
 
@@ -84,18 +84,24 @@ class CategoryService:
         return category_repo.update_hidden_status(category_id, hidden)
 
     @classmethod
-    def update_user_permissions(cls, category_id: int, user_id: int, permission: int, token: str):
-        # TODO: docstring
+    def update_user_permissions(cls, category_id: int,
+                                user_id: int,
+                                permission: int,
+                                token: str) -> dict:
+        """
+        Updates the permission level of a user for a category.
+        """
         AuthToken.validate_admin(token)
-
-        category = category_repo.get_category_by_id(category_id)
-
-        user = user_repo.get_user_by_id(user_id)
-        if not user or not category:
-            raise not_found
-
         if permission not in (0, 1, 2, 3):
             raise bad_request
+
+        category = category_repo.get_category_by_id(category_id)
+        if not category:
+            raise category_not_found
+
+        user = user_repo.get_user_by_id(user_id)
+        if not user:
+            raise user_not_found
 
         return category_repo.update_permissions(category_id, user_id, permission)
 

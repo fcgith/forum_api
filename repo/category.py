@@ -4,7 +4,7 @@ from models.category_permission import PermissionTypeEnum
 from data.connection import read_query, insert_query, update_query
 from models.topic import Topic
 from models.user import User
-from services.errors import not_found, category_not_found, bad_request, internal_error
+from services.errors import not_found, category_not_found, bad_request, internal_error, database_error
 from repo import topic as topics_repo
 from repo import user as user_repo
 
@@ -112,10 +112,10 @@ def update_hidden_status(category_id: int, hidden: int) -> dict:
     result = update_query(query, (hidden, category_id))
     if result:
         return {"message": "Category hidden status updated successfully."}
-    raise internal_error
+    raise database_error
 
 
-def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
+def update_permissions(category_id: int, user_id: int, permission: int) -> dict:
     query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
     result = read_query(query, (category_id, user_id))
     if not result:
@@ -124,7 +124,10 @@ def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
     else:
         query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
         result = update_query(query, (permission, category_id, user_id))
-    return True if result > 0 else False
+
+    if result > 0:
+        return {"message": "Category permissions updated successfully."}
+    raise database_error
 
 
 def update_locked_status(category_id: int) -> int:

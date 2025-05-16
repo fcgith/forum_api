@@ -6,6 +6,7 @@ access_denied = HTTPException(status_code=403, detail="Access denied")
 not_implemented = HTTPException(status_code=501, detail="Not implemented")
 internal_error = HTTPException(status_code=500, detail="Internal error")
 bad_request = HTTPException(status_code=400, detail="Bad request (invalid data provided)")
+database_error = HTTPException(status_code=500, detail="Database error")
 
 # user errors
 user_not_found = HTTPException(status_code=402, detail="User not found")
