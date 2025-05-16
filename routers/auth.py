@@ -47,7 +47,7 @@ async def register(user_data: UserCreate) -> RegisterResponse:
 
 @router.get("/", response_model=UserPublic)
 async def get_user_data_by_token\
-                (token: Header(..., alias="Authorization")) -> UserPublic | None:
+                (token: Header(..., alias="Authorization")) -> UserPublic:
     """
     Retrieve public user information by decoding a JWT token.
 
