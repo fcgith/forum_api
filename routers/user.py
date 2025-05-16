@@ -40,13 +40,15 @@ async def get_user_with_id(user_id: int) -> User | UserPublic:
     """
     return UserService.get_user(user_id, True)
 
-@router.get("/get-by-username/{username}")
+@router.get("/search/{username}")
 def get_by_username(username: str, token: str):
     """
     Gets public user data by username.
 
     Parameters
     ----------
+    username : str
+        Username to search for.
     token : str
         Authentication token.
 
