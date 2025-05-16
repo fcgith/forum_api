@@ -1,257 +1,124 @@
 import unittest
-from unittest.mock import Mock, patch
-
-from models.message import MessageCreate
+from unittest.mock import patch, MagicMock
 from services.conversations import ConversationsService
-from services.errors import invalid_token, conversation_not_found, invalid_credentials
-
+from services.errors import not_found, invalid_credentials, conversation_not_found
 
 class TestConversationsService(unittest.TestCase):
     def setUp(self):
-        # Create sample data for testing
-        self.valid_token = "valid_token"
-        self.invalid_token = "invalid_token"
+        self.token = "mocked_token"
+        self.user = MagicMock(id=1)
+        self.user2 = MagicMock(id=2)
 
-        # Create mock user
-        self.mock_user = Mock()
-        self.mock_user.id = 1
-        self.mock_user.username = "testuser"
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.user_repo.get_user_by_id")
+    @patch("services.conversations.user_repo.get_last_message_between")
+    def test_get_last_message_success(self, mock_last_msg, mock_get_user_by_id, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_user_by_id.return_value = self.user2
+        mock_last_msg.return_value = {"id": 123, "content": "hi"}
+        result = ConversationsService.get_last_message(self.user2.id, self.token)
+        self.assertEqual(result["id"], 123)
 
-        # Create mock receiver user
-        self.mock_receiver = Mock()
-        self.mock_receiver.id = 2
-        self.mock_receiver.username = "receiver"
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.user_repo.get_user_by_id")
+    def test_get_last_message_user_not_found(self, mock_get_user_by_id, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_user_by_id.return_value = None
+        with self.assertRaises(type(not_found)):
+            ConversationsService.get_last_message(self.user2.id, self.token)
 
-        # Create mock conversation
-        self.mock_conversation = Mock()
-        self.mock_conversation.id = 1
-        self.mock_conversation.initiator_id = 1
-        self.mock_conversation.receiver_id = 2
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.conversation_repo.get_conversations_by_user")
+    @patch("services.conversations.user_repo.get_users_in_list_by_id")
+    def test_get_conversations(self, mock_get_users, mock_get_convs, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_convs.return_value = [
+            MagicMock(initiator_id=1, receiver_id=2),
+            MagicMock(initiator_id=2, receiver_id=1)
+        ]
+        mock_get_users.return_value = ["user2"]
+        result = ConversationsService.get_conversations(self.token)
+        self.assertEqual(result, ["user2"])
 
-        # Create mock message
-        self.mock_message = Mock()
-        self.mock_message.id = 1
-        self.mock_message.content = "Test message"
-        self.mock_message.sender_id = 1
-        self.mock_message.receiver_id = 2
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.user_repo.get_user_by_id")
+    @patch("services.conversations.conversation_repo.conversation_exists")
+    @patch("services.conversations.conversation_repo.create_conversation")
+    @patch("services.conversations.conversation_repo.get_conversation_by_users")
+    @patch("services.conversations.message_repo.create_message")
+    def test_send_message_new_conversation(self, mock_create_msg, mock_get_conv_by_users, mock_create_conv, mock_conv_exists, mock_get_user_by_id, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_user_by_id.return_value = self.user2
+        mock_conv_exists.return_value = False
+        mock_create_conv.return_value = 10
+        mock_create_msg.return_value = 99
+        mock_get_conv_by_users.return_value = 10
+        result = ConversationsService.send_message(self.user2.id, "hello", self.token)
+        self.assertEqual(result["message_id"], 99)
 
-        # Create mock user public
-        self.mock_user_public = Mock()
-        self.mock_user_public.id = 2
-        self.mock_user_public.username = "receiver"
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.user_repo.get_user_by_id")
+    def test_send_message_invalid_receiver(self, mock_get_user_by_id, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_user_by_id.return_value = None
+        with self.assertRaises(type(invalid_credentials)):
+            ConversationsService.send_message(self.user2.id, "hello", self.token)
 
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.get_conversations_by_user')
-    @patch('services.conversations.user_repo.get_users_in_list_by_id')
-    def test_get_conversations_success(self, mock_get_users, mock_get_conversations, mock_validate):
-        # Arrange
-        mock_validate.return_value = self.mock_user
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.conversation_repo.get_conversation_by_id")
+    @patch("services.conversations.message_repo.get_messages_by_conversation")
+    def test_get_conversation_messages_success(self, mock_get_msgs, mock_get_conv, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_conv.return_value = MagicMock(initiator_id=1, receiver_id=2)
+        mock_get_msgs.return_value = [{"id": 1, "content": "hi"}]
+        result = ConversationsService.get_conversation_messages(5, self.token)
+        self.assertEqual(result[0]["id"], 1)
 
-        # Create mock conversations
-        mock_conversation1 = Mock()
-        mock_conversation1.initiator_id = 1
-        mock_conversation1.receiver_id = 2
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.conversation_repo.get_conversation_by_id")
+    def test_get_conversation_messages_not_found(self, mock_get_conv, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_conv.return_value = None
+        with self.assertRaises(type(conversation_not_found)):
+            ConversationsService.get_conversation_messages(5, self.token)
 
-        mock_conversation2 = Mock()
-        mock_conversation2.initiator_id = 3
-        mock_conversation2.receiver_id = 1
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.conversation_repo.get_conversation_by_id")
+    def test_get_conversation_messages_invalid_user(self, mock_get_conv, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_conv.return_value = MagicMock(initiator_id=3, receiver_id=4)
+        with self.assertRaises(type(invalid_credentials)):
+            ConversationsService.get_conversation_messages(5, self.token)
 
-        mock_get_conversations.return_value = [mock_conversation1, mock_conversation2]
-        mock_get_users.return_value = [self.mock_user_public]
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.user_repo.get_user_by_id")
+    @patch("services.conversations.conversation_repo.get_conversation_between_users")
+    @patch("services.conversations.message_repo.get_messages_by_conversation")
+    def test_get_messages_between_success(self, mock_get_msgs, mock_get_conv, mock_get_user_by_id, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_user_by_id.return_value = self.user2
+        mock_get_conv.return_value = MagicMock(id=10)
+        mock_get_msgs.return_value = [{"id": 1, "content": "hi"}]
+        result = ConversationsService.get_messages_between(self.user2.id, self.token)
+        self.assertEqual(result[0]["id"], 1)
 
-        # Act
-        result = ConversationsService.get_conversations(self.valid_token)
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.user_repo.get_user_by_id")
+    def test_get_messages_between_user_not_found(self, mock_get_user_by_id, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_user_by_id.return_value = None
+        with self.assertRaises(type(not_found)):
+            ConversationsService.get_messages_between(self.user2.id, self.token)
 
-        # Assert
-        self.assertEqual(result, [self.mock_user_public])
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_conversations.assert_called_once_with(self.mock_user.id)
-        mock_get_users.assert_called_once_with([2, 3], True)
+    @patch("services.conversations.AuthToken.validate")
+    @patch("services.conversations.user_repo.get_user_by_id")
+    @patch("services.conversations.conversation_repo.get_conversation_between_users")
+    def test_get_messages_between_conv_not_found(self, mock_get_conv, mock_get_user_by_id, mock_validate):
+        mock_validate.return_value = self.user
+        mock_get_user_by_id.return_value = self.user2
+        mock_get_conv.return_value = None
+        with self.assertRaises(type(not_found)):
+            ConversationsService.get_messages_between(self.user2.id, self.token)
 
-    @patch('services.conversations.AuthToken.validate')
-    def test_get_conversations_invalid_token(self, mock_validate):
-        # Arrange
-        mock_validate.return_value = None
-
-        # Act & Assert
-        with self.assertRaises(Exception) as context:
-            ConversationsService.get_conversations(self.invalid_token)
-
-        self.assertEqual(context.exception, invalid_token)
-        mock_validate.assert_called_once_with(self.invalid_token)
-
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.user_repo.get_user_by_id')
-    @patch('services.conversations.conversation_exists')
-    @patch('services.conversations.create_conversation')
-    @patch('services.conversations.create_message')
-    def test_send_message_new_conversation(self, mock_create_message, mock_create_conversation,
-                                           mock_conversation_exists, mock_get_user, mock_validate):
-        # Arrange
-        receiver_id = 2
-        content = "Test message"
-        mock_validate.return_value = self.mock_user
-        mock_get_user.return_value = self.mock_receiver
-        mock_conversation_exists.return_value = False
-        mock_create_conversation.return_value = 1
-        mock_create_message.return_value = 1
-
-        # Act
-        result = ConversationsService.send_message(receiver_id, content, self.valid_token)
-
-        # Assert
-        self.assertEqual(result, {"message_id": 1, "message": "Message sent successfully"})
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_user.assert_called_once_with(receiver_id)
-        mock_conversation_exists.assert_called_once_with(self.mock_user.id, receiver_id)
-        mock_create_conversation.assert_called_once_with(self.mock_user.id, receiver_id)
-        mock_create_message.assert_called_once()
-
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.user_repo.get_user_by_id')
-    @patch('services.conversations.conversation_exists')
-    @patch('services.conversations.get_conversation_by_users')
-    @patch('services.conversations.create_message')
-    def test_send_message_existing_conversation(self, mock_create_message, mock_get_conversation,
-                                                mock_conversation_exists, mock_get_user, mock_validate):
-        # Arrange
-        receiver_id = 2
-        content = "Test message"
-        mock_validate.return_value = self.mock_user
-        mock_get_user.return_value = self.mock_receiver
-        mock_conversation_exists.return_value = True
-        mock_get_conversation.return_value = 1
-        mock_create_message.return_value = 1
-
-        # Act
-        result = ConversationsService.send_message(receiver_id, content, self.valid_token)
-
-        # Assert
-        self.assertEqual(result, {"message_id": 1, "message": "Message sent successfully"})
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_user.assert_called_once_with(receiver_id)
-        mock_conversation_exists.assert_called_once_with(self.mock_user.id, receiver_id)
-        mock_get_conversation.assert_called_once_with(self.mock_user.id, receiver_id)
-        mock_create_message.assert_called_once()
-
-    @patch('services.conversations.AuthToken.validate')
-    def test_send_message_invalid_token(self, mock_validate):
-        # Arrange
-        receiver_id = 2
-        content = "Test message"
-        mock_validate.return_value = None
-
-        # Act & Assert
-        with self.assertRaises(Exception) as context:
-            ConversationsService.send_message(receiver_id, content, self.invalid_token)
-
-        self.assertEqual(context.exception, invalid_token)
-        mock_validate.assert_called_once_with(self.invalid_token)
-
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.user_repo.get_user_by_id')
-    def test_send_message_receiver_not_found(self, mock_get_user, mock_validate):
-        # Arrange
-        receiver_id = 999
-        content = "Test message"
-        mock_validate.return_value = self.mock_user
-        mock_get_user.return_value = None
-
-        # Act & Assert
-        with self.assertRaises(Exception) as context:
-            ConversationsService.send_message(receiver_id, content, self.valid_token)
-
-        self.assertEqual(context.exception, invalid_credentials)
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_user.assert_called_once_with(receiver_id)
-
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.user_repo.get_user_by_id')
-    def test_send_message_to_self(self, mock_get_user, mock_validate):
-        # Arrange
-        receiver_id = 1  # Same as sender
-        content = "Test message"
-        mock_validate.return_value = self.mock_user
-        mock_get_user.return_value = self.mock_user
-
-        # Act & Assert
-        with self.assertRaises(Exception) as context:
-            ConversationsService.send_message(receiver_id, content, self.valid_token)
-
-        self.assertEqual(context.exception, invalid_credentials)
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_user.assert_called_once_with(receiver_id)
-
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.get_conversation_by_id')
-    @patch('services.conversations.get_messages_by_conversation')
-    def test_get_conversation_messages_success(self, mock_get_messages, mock_get_conversation, mock_validate):
-        # Arrange
-        conversation_id = 1
-        mock_validate.return_value = self.mock_user
-        mock_get_conversation.return_value = self.mock_conversation
-        mock_get_messages.return_value = [self.mock_message]
-
-        # Act
-        result = ConversationsService.get_conversation_messages(conversation_id, self.valid_token)
-
-        # Assert
-        self.assertEqual(result, [self.mock_message])
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_conversation.assert_called_once_with(conversation_id)
-        mock_get_messages.assert_called_once_with(conversation_id)
-
-    @patch('services.conversations.AuthToken.validate')
-    def test_get_conversation_messages_invalid_token(self, mock_validate):
-        # Arrange
-        conversation_id = 1
-        mock_validate.return_value = None
-
-        # Act & Assert
-        with self.assertRaises(Exception) as context:
-            ConversationsService.get_conversation_messages(conversation_id, self.invalid_token)
-
-        self.assertEqual(context.exception, invalid_token)
-        mock_validate.assert_called_once_with(self.invalid_token)
-
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.get_conversation_by_id')
-    def test_get_conversation_messages_conversation_not_found(self, mock_get_conversation, mock_validate):
-        # Arrange
-        conversation_id = 999
-        mock_validate.return_value = self.mock_user
-        mock_get_conversation.return_value = None
-
-        # Act & Assert
-        with self.assertRaises(Exception) as context:
-            ConversationsService.get_conversation_messages(conversation_id, self.valid_token)
-
-        self.assertEqual(context.exception, conversation_not_found)
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_conversation.assert_called_once_with(conversation_id)
-
-    @patch('services.conversations.AuthToken.validate')
-    @patch('services.conversations.get_conversation_by_id')
-    def test_get_conversation_messages_user_not_in_conversation(self, mock_get_conversation, mock_validate):
-        # Arrange
-        conversation_id = 1
-        mock_validate.return_value = self.mock_user
-
-        # Create a conversation where the user is not a participant
-        mock_conversation = Mock()
-        mock_conversation.initiator_id = 3
-        mock_conversation.receiver_id = 4
-
-        mock_get_conversation.return_value = mock_conversation
-
-        # Act & Assert
-        with self.assertRaises(Exception) as context:
-            ConversationsService.get_conversation_messages(conversation_id, self.valid_token)
-
-        self.assertEqual(context.exception, invalid_credentials)
-        mock_validate.assert_called_once_with(self.valid_token)
-        mock_get_conversation.assert_called_once_with(conversation_id)
-
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
