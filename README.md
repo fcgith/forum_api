@@ -1,7 +1,7 @@
 # forum_api
 
 ## 📖 Overview
-A robust RESTful API backend for a modern forum system, built with **FastAPI** and **MariaDB**. This backend powers the [Forum API Frontend](https://github.com/fcgith/forum_api_front_end) and provides endpoints for user management, authentication, categories, topics, replies, voting, and direct messaging.
+A robust RESTful API backend for a modern forum system, built with **FastAPI** and **MariaDB**. The backend provides endpoints for user management, authentication, categories, topics, replies, voting, and direct messaging.
 
 ---
 
