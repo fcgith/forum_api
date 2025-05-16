@@ -52,7 +52,7 @@ class RepliesService:
         if not result:
             raise internal_error
 
-        return {"id": result}
+        return {"message": "Reply successfully added", "id": result}
 
     @classmethod
     def set_best_reply(cls, reply_id: int, topic_id: int, token: str) -> bool:

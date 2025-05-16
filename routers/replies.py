@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 
-from models.reply import Reply, ReplyCreate
+from models.reply import Reply, ReplyCreate, ReplyVote
 from services.replies import RepliesService
 
 router = APIRouter(tags=["replies"])
@@ -28,8 +28,8 @@ async def select_best_reply(reply_id: int, topic_id: int, token: str):
     return RepliesService.set_best_reply(reply_id, topic_id, token)
 
 
-@router.put("/vote/{reply_id}/{vote}")
-async def vote_reply(reply_id: int, vote: int, token: str):
+@router.put("/vote/{reply_id}")
+async def vote_reply(reply_id: int, vote: ReplyVote, token: str):
     """
     Cast a vote (upvote or downvote) on a reply.
 
@@ -38,7 +38,7 @@ async def vote_reply(reply_id: int, vote: int, token: str):
     reply_id : int
         The ID of the reply to vote on.
     vote : int
-        The vote value (1 for upvote, 0 for downvote).
+        The vote value (1 for upvote, 0 for removing a vote, -1 for downvote).
     token : str
         Authentication token of the voting user.
 
@@ -47,7 +47,7 @@ async def vote_reply(reply_id: int, vote: int, token: str):
     dict
         A response indicating the result of the vote operation.
     """
-    return RepliesService.set_vote(reply_id, vote, token)
+    return RepliesService.set_vote(reply_id, vote.vote, token)
 
 
 @router.get("/vote/{reply_id}")
@@ -70,7 +70,7 @@ async def get_user_reply_vote(reply_id: int, token: str):
     return RepliesService.get_vote(reply_id, token)
 
 
-@router.post("/add/{topic_id}")
+@router.post("/{topic_id}")
 async def add_reply(token: str, topic_id: int, reply: ReplyCreate):
     """
     Add a new reply to a specific topic.
