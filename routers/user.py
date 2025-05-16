@@ -7,22 +7,21 @@ router = APIRouter(tags=["user"])
 
 
 @router.get("/", response_model=List[User])
-async def get_all_users(token: str) -> List[User]:
+async def get_all_users(token: str = Header(..., alias="Authorization")) -> List[User]:
     """
-    Fetches and returns a list of all users if the provided auth token is valid and the user is an admin.
+    Fetches and returns a list of all users if the authenticated user is valid and an admin.
 
     Parameters
     ----------
     token : str
-        Token used for user authentication and authorization.
+        Header Authentication token used for user authentication and authorization.
 
     Returns
     -------
     List[User]
         A list of user objects.
     """
-    users = UserService.get_users(token)
-    return users
+    return UserService.get_users(token)
 
 
 @router.get("/me", response_model=UserPublic)
@@ -44,10 +43,10 @@ async def get_user_by_token \
     return UserService.get_user_by_token(token, True)
 
 
-@router.get("/{user_id}")
-async def get_user_with_id(user_id: int) -> User | UserPublic:
+@router.get("/{user_id}", response_model=UserPublic)
+async def get_user_by_id(user_id: int) -> UserPublic:
     """
-    Retrieve a user by their ID number.
+    Retrieve a user's public data by their ID number.
 
     Parameters
     ----------
@@ -62,8 +61,9 @@ async def get_user_with_id(user_id: int) -> User | UserPublic:
     return UserService.get_user(user_id, True)
 
 
-@router.get("/search/{username}")
-def get_by_username(username: str, token: str):
+@router.get("/search/{username}", response_model=UserPublic)
+def get_by_username(username: str,
+                    token: str = Header(..., alias="Authorization")) -> UserPublic:
     """
     Gets public user data by username.
 
@@ -72,7 +72,7 @@ def get_by_username(username: str, token: str):
     username : str
         Username to search for.
     token : str
-        Authentication token.
+        Header Authentication token.
 
     Returns
     -------
@@ -82,21 +82,21 @@ def get_by_username(username: str, token: str):
     return UserService.get_user_by_username(username, token, True)
 
 
-@router.put("/avatar/")
-async def update_avatar(token: str, link: str):
+@router.put("/avatar/", response_model=dict)
+async def update_avatar(link: str, token: str = Header(..., alias="Authorization")) -> dict:
     """
     Update user avatar.
 
     Parameters
     ----------
     token : str
-        Authentication token.
+        Head Authentication token.
 
     link : str
         Link to avatar image.
 
     Returns
     -------
-    1 for success or raises HTTPException
+        dict with a message notifying the success or failure of the operation.
     """
     return UserService.set_avatar(token, link)

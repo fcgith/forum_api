@@ -15,7 +15,7 @@ class UserService:
         if user:
             return user
         else:
-            raise not_found
+            raise user_not_found
 
     @classmethod
     def get_users(cls, token: str, public: bool = False) -> List[User]:
@@ -38,14 +38,16 @@ class UserService:
             raise user_not_found
 
     @classmethod
-    def set_avatar(cls, token, link):
+    def set_avatar(cls, token, link) -> dict:
         user = AuthToken.validate(token)
-        result = user_repo.set_user_avatar(user, link)
-        return result
+        user_repo.set_user_avatar(user, link)
+        return {"message": "Avatar set successfully"}
 
     @classmethod
     def get_user_by_token(cls, token, public: bool = True):
         if AuthToken.validate_expiry(token):
             user = AuthToken.validate(token, public=public)
+            if not user:
+                raise invalid_token
             return user
         raise invalid_token
