@@ -108,7 +108,7 @@ async def update_hide_status(data: UpdateHiddenStatus,
     return CategoryService.update_hidden_status(data.category_id, data.hidden, token)
 
 
-@router.put("/update-user-permissions", response_model=dict)
+@router.put("/user-permissions", response_model=dict)
 async def update_user_permissions(data: UpdateUserPermission,
                                   token: str = Header(..., alias="Authorization")) -> dict:
     """
