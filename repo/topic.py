@@ -21,12 +21,14 @@ def gen_topic(result: tuple) -> Topic:
         replies_count=len(get_replies_by_topic_id(result[0])),
         locked=result[6])
 
+
 def get_topic_by_id(topic_id: int) -> Topic | None:
     query = "SELECT * FROM topics WHERE id = ?"
     result = read_query(query, (topic_id,))
     if result:
         return gen_topic(result[0])
     return None
+
 
 def get_topics_by_category(category_id: int) -> List[Topic] | None:
     query = "SELECT * FROM topics WHERE category_id = ? ORDER BY date DESC"
@@ -36,6 +38,7 @@ def get_topics_by_category(category_id: int) -> List[Topic] | None:
         return topics
     return None
 
+
 def get_topics_count_by_category(category_id: int) -> int:
     query = "SELECT COUNT(*) FROM topics WHERE category_id = ?"
     result = read_query(query, (category_id,))
@@ -43,10 +46,12 @@ def get_topics_count_by_category(category_id: int) -> int:
         return result[0][0]
     return 0
 
+
 def create_topic(data: TopicCreate, user_id: int) -> int | None:
     query = "INSERT INTO topics (name, content, category_id, user_id) VALUES (?, ?, ?, ?)"
     result = insert_query(query, (data.name, data.content, data.category_id, user_id))
     return result
+
 
 def get_all_topics() -> dict:
     query = "SELECT * FROM topics"
@@ -54,6 +59,7 @@ def get_all_topics() -> dict:
     topics = [gen_topic(row) for row in result]
     pages = len(topics) // 10 + 1
     return {"pages": pages, "topics": topics}
+
 
 def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> dict | None:
     params = []

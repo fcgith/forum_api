@@ -1,6 +1,6 @@
 import repo.conversation as conversation_repo
 import repo.message as message_repo
-import repo.user  as user_repo
+import repo.user as user_repo
 from models.message import MessageCreate
 from services.errors import invalid_token, not_found, invalid_token, conversation_not_found, invalid_credentials
 from services.utils import AuthToken
@@ -39,10 +39,10 @@ class ConversationsService:
         for conversation in conversations:
             if conversation.initiator_id == user.id and conversation.receiver_id not in users:
                 users.append(conversation.receiver_id)
-            elif conversation.receiver_id ==user.id and conversation.initiator_id not in users:
+            elif conversation.receiver_id == user.id and conversation.initiator_id not in users:
                 users.append(conversation.initiator_id)
 
-        return user_repo.get_users_in_list_by_id(users,True)
+        return user_repo.get_users_in_list_by_id(users, True)
 
     @classmethod
     def send_message(cls, receiver_id: int, content: str, token: str):
@@ -60,23 +60,21 @@ class ConversationsService:
         user = AuthToken.validate(token)
         receiver_user = user_repo.get_user_by_id(receiver_id)
 
-        if not receiver_user or receiver_id==user.id:
+        if not receiver_user or receiver_id == user.id:
             raise invalid_credentials
 
         if not conversation_repo.conversation_exists(user.id, receiver_id):
             conversation_id = conversation_repo.create_conversation(user.id, receiver_id)
         else:
-            conversation_id=conversation_repo.get_conversation_by_users(user.id,receiver_id)
-
+            conversation_id = conversation_repo.get_conversation_by_users(user.id, receiver_id)
 
         message_data = MessageCreate(
             content=content,
             receiver_id=receiver_id
         )
 
-        message_id = message_repo.create_message(message_data,conversation_id,user.id)
+        message_id = message_repo.create_message(message_data, conversation_id, user.id)
         return {"message_id": message_id, "message": "Message sent successfully"}
-
 
     @classmethod
     def get_conversation_messages(cls, conversation_id: int, token: str):
@@ -96,7 +94,7 @@ class ConversationsService:
         if not conversation:
             raise conversation_not_found
 
-        if user.id not in ( conversation.initiator_id , conversation.receiver_id):
+        if user.id not in (conversation.initiator_id, conversation.receiver_id):
             raise invalid_credentials
 
         messages = message_repo.get_messages_by_conversation(conversation_id)

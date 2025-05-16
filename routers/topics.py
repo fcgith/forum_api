@@ -26,10 +26,11 @@ async def create_topic(topic: TopicCreate, token: str):
     """
     return TopicsService.create_topic(topic, token)
 
-#TODO:  Duplicated code-  get_topic
+
+# TODO:  Duplicated code-  get_topic
 
 @router.get("/{topic_id}")
-async def get_topic(token: str,topic_id: int):
+async def get_topic(token: str, topic_id: int):
     """
     Retrieve a topic by its ID.
 
@@ -46,10 +47,11 @@ async def get_topic(token: str,topic_id: int):
         The topic data.
     """
 
-    return TopicsService.get_topic(topic_id,token)
+    return TopicsService.get_topic(topic_id, token)
+
 
 @router.get("/{topic_id}/replies")
-async def get_topic(token: str,topic_id: int):
+async def get_topic(token: str, topic_id: int):
     """
     Retrieve a topic by its ID.
 
@@ -67,8 +69,9 @@ async def get_topic(token: str,topic_id: int):
     """
     return RepliesService.get_topic_replies(topic_id, token)
 
+
 @router.get("/")
-async def get_topics(token: str,search:str=None,sort:str="DESC",page:int=0,):
+async def get_topics(token: str, search: str = None, sort: str = "DESC", page: int = 0, ):
     """
     Retrieve a list of topics with optional filtering, sorting, and pagination.
 
@@ -89,6 +92,7 @@ async def get_topics(token: str,search:str=None,sort:str="DESC",page:int=0,):
         A list of topics with pagination metadata.
     """
     return TopicsService.get_topics(token=token, search=search, sort=sort, page=page)
+
 
 @router.put("/{topic_id}/lock")
 async def lock_topic(topic_id: int, token: str) -> bool:

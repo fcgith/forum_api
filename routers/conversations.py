@@ -8,7 +8,7 @@ router = APIRouter(tags=["conversations"])
 
 
 @router.get("/")
-async def get_all_conversations(token: str)-> List[UserPublic]:
+async def get_all_conversations(token: str) -> List[UserPublic]:
     """
     Retrieve all users the authenticated user has had conversations with.
 
@@ -23,6 +23,7 @@ async def get_all_conversations(token: str)-> List[UserPublic]:
         A list of users with whom the authenticated user has exchanged messages.
     """
     return ConversationsService.get_conversations(token)
+
 
 @router.get("/last-message/{user_id}")
 async def get_last_message(user_id: int, token: str):
@@ -42,6 +43,7 @@ async def get_last_message(user_id: int, token: str):
         Last message details.
     """
     return ConversationsService.get_last_message(user_id, token)
+
 
 @router.post("/messages/")
 async def send_message(message: MessageCreate, token: str):
@@ -63,7 +65,6 @@ async def send_message(message: MessageCreate, token: str):
     return ConversationsService.send_message(message.receiver_id, message.content, token)
 
 
-
 @router.get("/{conversation_id}")
 async def get_conversation_messages(conversation_id: int, token: str):
     """
@@ -82,6 +83,7 @@ async def get_conversation_messages(conversation_id: int, token: str):
         A list of messages in the specified conversation.
     """
     return ConversationsService.get_conversation_messages(conversation_id, token)
+
 
 @router.get("/msg/{user_id}")
 async def get_messages_beetween(user_id: int, token: str):

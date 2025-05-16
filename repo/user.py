@@ -25,6 +25,7 @@ def gen_user(result: tuple, public: bool = False) -> User | UserPublic:
         admin=result[6]
     )
 
+
 def get_all_users() -> List[User] | None:
     """
     Returns all users if the requester is an admin and authenticated, non-public user data
@@ -34,6 +35,7 @@ def get_all_users() -> List[User] | None:
     result = read_query(query)
     users = [gen_user(row) for row in result]
     return users
+
 
 def get_user_by_id(user_id: int, public: bool = False, tup=False) -> User | tuple | None:
     """
@@ -49,6 +51,7 @@ def get_user_by_id(user_id: int, public: bool = False, tup=False) -> User | tupl
     else:
         return None
 
+
 def get_user_by_username(username: str, public: bool = False) -> User | None:
     """
     Returns User if such exists by username or UserPublic if such is requested via service
@@ -62,6 +65,7 @@ def get_user_by_username(username: str, public: bool = False) -> User | None:
         return gen_user(result[0], public)
     else:
         return None
+
 
 def get_user_by_email(email: str, public: bool = False) -> User | None:
     """
@@ -77,6 +81,7 @@ def get_user_by_email(email: str, public: bool = False) -> User | None:
     else:
         return None
 
+
 def user_exists(data: ()) -> bool:
     """
     Determines if a user exists in the database based on the provided
@@ -89,6 +94,7 @@ def user_exists(data: ()) -> bool:
     result = read_query(query, data)
     return True if result else False
 
+
 def insert_user(data: UserCreate) -> int | None:
     """
     Adds a new user in the database
@@ -97,11 +103,12 @@ def insert_user(data: UserCreate) -> int | None:
     """
     query = "INSERT INTO users (username, password, email, birthday) VALUES (?, ?, ?, ?)"
     result = insert_query(query,
-                            (data.username,
-                                    data.password,
-                                    data.email,
-                                    data.birthday))
+                          (data.username,
+                           data.password,
+                           data.email,
+                           data.birthday))
     return result
+
 
 def get_users_in_list_by_id(lst: List[int], public: bool = False) -> List[User] | List[UserPublic]:
     """
@@ -121,6 +128,7 @@ def get_users_with_permissions_for_category(category_id) -> list:
         for row in result:
             data.append({"user": get_user_by_id(row[0]), "permission": row[1]})
     return data
+
 
 def get_user_category_permissions(user_id: int) -> dict[int, int]:
     query = "SELECT category_id, type FROM category_permissions WHERE user_id = ?"

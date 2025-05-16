@@ -49,6 +49,7 @@ async def vote_reply(reply_id: int, vote: int, token: str):
     """
     return RepliesService.set_vote(reply_id, vote, token)
 
+
 @router.get("/vote/{reply_id}")
 async def get_user_reply_vote(reply_id: int, token: str):
     """
@@ -67,6 +68,7 @@ async def get_user_reply_vote(reply_id: int, token: str):
         The vote of the user if any else 0 for no vote
     """
     return RepliesService.get_vote(reply_id, token)
+
 
 @router.post("/add/{topic_id}")
 async def add_reply(token: str, topic_id: int, reply: ReplyCreate):

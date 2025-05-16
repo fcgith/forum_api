@@ -8,7 +8,6 @@ from services.errors import access_denied, invalid_token, internal_error
 
 
 class AuthToken:
-
     ALGORITHM = "HS256"
     SECRET_KEY = "fh8q247ghf0qb8374fhq2847hf0q89734gfh7"
 
@@ -16,7 +15,7 @@ class AuthToken:
     def generate(cls, data: dict) -> str:
         ## TODO: docstring
         encode_data = data.copy()
-        encode_data['exp'] = (datetime.now(timezone.utc) + timedelta(minutes=60*8)).timestamp()
+        encode_data['exp'] = (datetime.now(timezone.utc) + timedelta(minutes=60 * 8)).timestamp()
         token = jwt.encode(encode_data, cls.SECRET_KEY, algorithm=cls.ALGORITHM)
         # Ensure the token is a string
         if isinstance(token, bytes):

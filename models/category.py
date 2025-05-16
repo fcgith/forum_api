@@ -2,6 +2,7 @@ from typing import Optional
 from pydantic import BaseModel
 from models.category_permission import PermissionTypeEnum
 
+
 class Category(BaseModel):
     id: int
     name: str
@@ -20,9 +21,11 @@ class CategoryResponse(Category):
     content: str
     user_permission: Optional[PermissionTypeEnum] = None
 
+
 class UpdateHiddenStatus(BaseModel):
     category_id: int
     hidden: int = 0
+
 
 class UpdateUserPermission(BaseModel):
     category_id: int

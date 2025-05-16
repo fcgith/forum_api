@@ -2,8 +2,9 @@ from typing import List
 
 from models.user import User, UserPublic
 import repo.user as user_repo
-from services.errors import access_denied, not_found, internal_error
+from services.errors import access_denied, not_found, internal_error, user_not_found
 from services.utils import AuthToken
+
 
 class UserService:
 
@@ -33,10 +34,10 @@ class UserService:
         if user:
             return user
         else:
-            raise not_found
+            raise user_not_found
 
     @classmethod
     def set_avatar(cls, token, link):
-         user = AuthToken.validate(token)
-         result = user_repo.set_user_avatar(user, link)
-         return result
+        user = AuthToken.validate(token)
+        result = user_repo.set_user_avatar(user, link)
+        return result

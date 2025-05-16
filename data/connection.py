@@ -14,6 +14,7 @@ pool = ConnectionPool(
     database="forum"
 )
 
+
 def get_db() -> Connection:
     """
     Provides a database connection from the connection pool.
@@ -29,6 +30,7 @@ def get_db() -> Connection:
     finally:
         if conn:
             conn.close()
+
 
 def read_query(query: str, params: () = ()) -> List[Tuple] | None:
     """
@@ -49,6 +51,7 @@ def read_query(query: str, params: () = ()) -> List[Tuple] | None:
             if cursor:
                 cursor.close()
 
+
 def affect_query(qtype: int, query: str, params: ()) -> int | None:
     with get_db() as db:
         cursor = None
@@ -64,12 +67,14 @@ def affect_query(qtype: int, query: str, params: ()) -> int | None:
             if cursor:
                 cursor.close()
 
+
 def insert_query(query: str, params: () = ()) -> int | None:
     """
     Executes an insert SQL query and commits the transaction to the database.
     Returns the ID of the inserted row.
     """
     return affect_query(0, query, params)
+
 
 def update_query(query: str, params: () = ()) -> int | None:
     """

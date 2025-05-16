@@ -10,7 +10,7 @@ from services.utils import AuthToken
 
 class CategoryService:
     @classmethod
-    def get_all(cls,token) -> list[Category]:
+    def get_all(cls, token) -> list[Category]:
         """
         Retrieve all categories from the database.
         """
@@ -25,7 +25,7 @@ class CategoryService:
         return category_repo.get_all_viewable_categories(user)
 
     @classmethod
-    def get_by_id(cls, category_id: int,token: str) -> Category:
+    def get_by_id(cls, category_id: int, token: str) -> Category:
         """
         Retrieve a specific category by ID.
 
@@ -45,7 +45,7 @@ class CategoryService:
         return category
 
     @classmethod
-    def create(cls, data: CategoryCreate,token: str) -> int:
+    def create(cls, data: CategoryCreate, token: str) -> int:
         """
         Create a new category in the system.
 

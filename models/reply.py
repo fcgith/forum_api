@@ -12,5 +12,6 @@ class Reply(BaseModel):
     user_name: str = "Error fetching username"
     likes: int = 0
 
+
 class ReplyCreate(BaseModel):
     content: str

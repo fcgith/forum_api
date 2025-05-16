@@ -6,6 +6,7 @@ from services.auth import AuthService
 
 router = APIRouter(tags=["auth"])
 
+
 @router.post("/login", response_model=LoginResponse)
 async def login(user_data: UserLogin) -> LoginResponse:
     """
@@ -23,6 +24,7 @@ async def login(user_data: UserLogin) -> LoginResponse:
     """
     return AuthService.login_user(user_data)
 
+
 @router.post("/register", response_model=RegisterResponse)
 async def register(user_data: UserCreate) -> RegisterResponse:
     """
@@ -39,6 +41,7 @@ async def register(user_data: UserCreate) -> RegisterResponse:
         A response indicating the result and status of the registration process.
     """
     return AuthService.register_user(user_data)
+
 
 @router.get("/")
 async def get_user_data_by_token(token: str) -> UserPublic | None:

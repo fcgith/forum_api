@@ -8,6 +8,7 @@ from services.errors import not_found, category_not_found, bad_request
 from repo import topic as topics_repo
 from repo import user as user_repo
 
+
 def gen_category(result: tuple) -> Category:
     return Category(
         id=result[0],
@@ -18,12 +19,14 @@ def gen_category(result: tuple) -> Category:
         topics_count=topics_repo.get_topics_count_by_category(result[0])
     )
 
+
 def get_all_categories() -> List[Category] | None:
     query = "SELECT * FROM categories"
     result = read_query(query)
     if result:
         return [gen_category(row) for row in result]
     return []
+
 
 def get_all_viewable_categories(user: User) -> List[Category]:
     viewable_ids = get_viewable_category_ids(user)
@@ -34,6 +37,7 @@ def get_all_viewable_categories(user: User) -> List[Category]:
         return []
     return [gen_category(row) for row in result]
 
+
 def get_category_by_id(category_id: int) -> Category | None:
     query = "SELECT * FROM categories WHERE id = ?"
     result = read_query(query, (category_id,))
@@ -41,9 +45,11 @@ def get_category_by_id(category_id: int) -> Category | None:
         return gen_category(result[0])
     return None
 
+
 def create_category(data: CategoryCreate) -> int | None:
     query = "INSERT INTO categories (name, description) VALUES (?, ?)"
     return insert_query(query, (data.name, data.description))
+
 
 def check_category_write_permission(category_id: int, user: User) -> bool:
     if user.is_admin():
@@ -60,6 +66,7 @@ def check_category_write_permission(category_id: int, user: User) -> bool:
         perm = get_user_category_permission(category_id, user)
         return perm >= 3
 
+
 def check_category_read_permission(category_id: int, user: User) -> bool:
     if user.is_admin():
         return True
@@ -75,7 +82,7 @@ def check_category_read_permission(category_id: int, user: User) -> bool:
         perm = get_user_category_permission(category_id, user)
 
         if perm == 0:
-            return False # no permission at all
+            return False  # no permission at all
 
         return perm >= 2
 
@@ -88,19 +95,23 @@ def get_viewable_category_ids(user: User) -> List[int]:
         if check_category_read_permission(category_id, user)
     ]
 
+
 def get_all_category_ids() -> List[int]:
     query = "SELECT id FROM categories"
     return [row[0] for row in read_query(query)]
 
+
 def get_user_category_permission(category_id: int, user: User) -> int:
     query = "SELECT type FROM category_permissions WHERE category_id = ? AND user_id = ?"
     result = read_query(query, (category_id, user.id))
-    return 1 if len(result) == 0 else result[0][0] # 1 = Default
+    return 1 if len(result) == 0 else result[0][0]  # 1 = Default
+
 
 def update_hidden_status(category_id: int, hidden: int) -> bool:
     query = "UPDATE categories SET hidden = ? WHERE id = ?"
     result = update_query(query, (hidden, category_id))
     return True if result else False
+
 
 def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
     query = "SELECT * FROM category_permissions WHERE category_id = ? AND user_id = ?"
@@ -112,6 +123,7 @@ def update_permissions(category_id: int, user_id: int, permission: int) -> bool:
         query = "UPDATE category_permissions SET type = ? WHERE category_id = ? AND user_id = ?"
         result = update_query(query, (permission, category_id, user_id))
     return True if result > 0 else False
+
 
 def update_locked_status(category_id: int) -> int:
     query = "UPDATE categories SET locked = 1 WHERE id = ?"

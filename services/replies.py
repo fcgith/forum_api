@@ -41,10 +41,10 @@ class RepliesService:
 
         if not topic:
             raise topic_not_found
-        if topic.locked ==1:
+        if topic.locked == 1:
             raise topic_locked
 
-        if not category_repo.check_category_write_permission(topic.category_id, user)\
+        if not category_repo.check_category_write_permission(topic.category_id, user) \
                 or topic.locked == 1:
             raise reply_not_accessible
 
@@ -52,7 +52,7 @@ class RepliesService:
         if not result:
             raise internal_error
 
-        return {"id":result}
+        return {"id": result}
 
     @classmethod
     def set_best_reply(cls, reply_id: int, topic_id: int, token: str) -> bool:

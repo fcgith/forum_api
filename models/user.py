@@ -17,6 +17,7 @@ class User(BaseModel):
     def is_admin(self):
         return self.admin > 0
 
+
 class UserPublic(BaseModel):
     id: int | None
     username: str

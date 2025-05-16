@@ -3,6 +3,7 @@ from models.reply import Reply
 from models.user import User
 from repo.user import get_user_by_id
 
+
 def gen_reply(reply: tuple) -> Reply:
     return Reply(id=reply[0],
                  content=reply[1],
@@ -13,10 +14,12 @@ def gen_reply(reply: tuple) -> Reply:
                  user_name=get_user_by_id(reply[4]).username,
                  likes=get_reply_votes(reply[0]))
 
+
 def get_reply_by_id(reply_id: int) -> Reply | None:
     query = "SELECT * FROM replies WHERE id = ?"
     result = read_query(query, (reply_id,))
     return gen_reply(result[0]) if result else None
+
 
 def set_reply_vote(reply_id: int, user_id: int, vote: int) -> dict | None:
     if vote not in (-1, 0, 1):
@@ -33,16 +36,19 @@ def set_reply_vote(reply_id: int, user_id: int, vote: int) -> dict | None:
 
     return {"success": result > 0}
 
+
 def get_reply_votes(reply_id: int) -> int:
     query = "SELECT type FROM votes WHERE reply_id = ?"
     result = read_query(query, (reply_id,))
     votes = [row[0] for row in result]
     return sum(votes) if len(votes) > 0 else 0
 
+
 def add_reply_to_topic(content: str, topic_id: int, user_id: int) -> int | None:
     query = "INSERT INTO replies (content, topic_id, user_id) VALUES (?, ?, ?)"
     result = insert_query(query, (content, topic_id, user_id))
     return result
+
 
 def set_reply_as_best(reply_id: int, topic_id: int) -> bool | None:
     query = "SELECT * FROM replies WHERE topic_id = ? AND best_reply = 1"
@@ -57,6 +63,7 @@ def set_reply_as_best(reply_id: int, topic_id: int) -> bool | None:
     query = "UPDATE replies SET best_reply = 1 WHERE id = ?"
     result = update_query(query, (reply_id,))
     return True if result else False
+
 
 def get_replies_in_topic(topic_id):
     query = "SELECT * FROM replies WHERE topic_id = ? ORDER BY id ASC"

@@ -28,7 +28,7 @@ async def get_all_categories(token: str) -> List[Category]:
 
 
 @router.get("/{category_id}", response_model=Category)
-async def get_category_by_id(category_id: int,token: str) -> Category:
+async def get_category_by_id(category_id: int, token: str) -> Category:
     """
     Retrieve a category by its unique ID.
 
@@ -44,10 +44,11 @@ async def get_category_by_id(category_id: int,token: str) -> Category:
     Category
         The category with the given ID.
     """
-    return CategoryService.get_by_id(category_id,token)
+    return CategoryService.get_by_id(category_id, token)
+
 
 @router.get("/{category_id}/topics", response_model=List[Topic])
-async def get_topics_by_category(category_id: int,token: str) -> List[Topic]:
+async def get_topics_by_category(category_id: int, token: str) -> List[Topic]:
     """
     Retrieve a list of topics associated with a specific category.
 
@@ -65,8 +66,9 @@ async def get_topics_by_category(category_id: int,token: str) -> List[Topic]:
     """
     return CategoryService.get_topics_by_category_id(category_id, token)
 
+
 @router.post("/add", response_model=int)
-async def create_category(data: CategoryCreate,token: str) -> int:
+async def create_category(data: CategoryCreate, token: str) -> int:
     """
     Create a new category with the given details.
 
@@ -82,7 +84,8 @@ async def create_category(data: CategoryCreate,token: str) -> int:
     int
         The ID of the newly created category.
     """
-    return CategoryService.create(data,token)
+    return CategoryService.create(data, token)
+
 
 @router.put("/update-hide-status", response_model=bool)
 async def update_hide_status(token: str, data: UpdateHiddenStatus) -> bool:
@@ -123,6 +126,7 @@ async def update_user_permissions(token: str, data: UpdateUserPermission) -> boo
     """
     return CategoryService.update_user_permissions(data.category_id, data.user_id, data.permission, token)
 
+
 @router.get("/{category_id}/get-users-with-permissions", response_model=list)
 async def get_users_with_view_or_read_perms(token: str, category_id: int) -> list:
     """
@@ -142,6 +146,7 @@ async def get_users_with_view_or_read_perms(token: str, category_id: int) -> lis
     """
     return UserService.get_users_with_permissions_for_category(category_id, token)
 
+
 @router.get("/{category_id}/check-permission")
 async def check_authenticated_user_category_permission(token: str, category_id: int):
     """
@@ -160,6 +165,7 @@ async def check_authenticated_user_category_permission(token: str, category_id: 
         A dictionary with the key 'access_type' indicating permission level.
     """
     return {"access_type": CategoryService.get_read_or_write_permission(category_id, token)}
+
 
 @router.put("/{category_id}/lock")
 async def lock_category(token: str, category_id: int):
