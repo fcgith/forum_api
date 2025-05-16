@@ -45,7 +45,7 @@ async def register(user_data: UserCreate) -> RegisterResponse:
     return AuthService.register_user(user_data)
 
 
-@router.get("/", response_model=UserPublic)
+@router.get("/")
 async def get_user_data_by_token\
                 (token: Header(..., alias="Authorization")) -> UserPublic:
     """
