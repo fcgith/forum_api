@@ -1,6 +1,6 @@
 from typing import List
-from fastapi import APIRouter
-from models.message import MessageCreate
+from fastapi import APIRouter, Header
+from models.message import MessageCreate, Message
 from models.user import UserPublic
 from services.conversations import ConversationsService
 
@@ -8,7 +8,7 @@ router = APIRouter(tags=["conversations"])
 
 
 @router.get("/")
-async def get_all_conversations(token: str) -> List[UserPublic]:
+async def get_all_conversations(token: str = Header(..., alias="Authorization")) -> List[UserPublic]:
     """
     Retrieve all users the authenticated user has had conversations with.
 
@@ -25,8 +25,9 @@ async def get_all_conversations(token: str) -> List[UserPublic]:
     return ConversationsService.get_conversations(token)
 
 
-@router.get("/last-message/{user_id}")
-async def get_last_message(user_id: int, token: str):
+@router.get("/last-message/{user_id}", response_model=Message)
+async def get_last_message(user_id: int,
+                           token: str = Header(..., alias="Authorization")) -> Message:
     """
     Gets the last message in the conversation between a user and authenticated user.
 
@@ -46,7 +47,7 @@ async def get_last_message(user_id: int, token: str):
 
 
 @router.post("/messages/")
-async def send_message(message: MessageCreate, token: str):
+async def send_message(message: MessageCreate, token: str = Header(..., alias="Authorization")):
     """
     Send a message to another user. Starts a new conversation if one does not exist.
 
@@ -65,8 +66,9 @@ async def send_message(message: MessageCreate, token: str):
     return ConversationsService.send_message(message.receiver_id, message.content, token)
 
 
-@router.get("/{conversation_id}")
-async def get_conversation_messages(conversation_id: int, token: str):
+@router.get("/{conversation_id}", response_model=List[Message])
+async def get_conversation_messages(conversation_id: int,
+                                    token: str = Header(..., alias="Authorization")) -> List[Message]:
     """
     Retrieve all messages in a specific conversation.
 
@@ -85,8 +87,9 @@ async def get_conversation_messages(conversation_id: int, token: str):
     return ConversationsService.get_conversation_messages(conversation_id, token)
 
 
-@router.get("/msg/{user_id}")
-async def get_messages_beetween(user_id: int, token: str):
+@router.get("/msg/{user_id}", response_model=List[Message])
+async def get_messages_beetween(user_id: int,
+                                token: str = Header(..., alias="Authorization")) -> List[Message]:
     """
     Gets the messages between two users with user ID and authentication token.
 

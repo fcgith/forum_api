@@ -1,14 +1,16 @@
+from typing import List
+
 import repo.conversation as conversation_repo
 import repo.message as message_repo
 import repo.user as user_repo
-from models.message import MessageCreate
+from models.message import MessageCreate, Message
 from services.errors import invalid_token, not_found, invalid_token, conversation_not_found, invalid_credentials
 from services.utils import AuthToken
 
 
 class ConversationsService:
     @classmethod
-    def get_last_message(cls, user_id: int, token: str) -> dict:
+    def get_last_message(cls, user_id: int, token: str) -> Message:
         user = AuthToken.validate(token)
         user2 = user_repo.get_user_by_id(user_id)
         if not user2:
@@ -77,7 +79,7 @@ class ConversationsService:
         return {"message_id": message_id, "message": "Message sent successfully"}
 
     @classmethod
-    def get_conversation_messages(cls, conversation_id: int, token: str):
+    def get_conversation_messages(cls, conversation_id: int, token: str) -> List[Message]:
         """
         Get all messages in a conversation
 
@@ -98,10 +100,14 @@ class ConversationsService:
             raise invalid_credentials
 
         messages = message_repo.get_messages_by_conversation(conversation_id)
+
+        if not messages:
+            raise not_found
+
         return messages
 
     @classmethod
-    def get_messages_between(cls, user_id, token):
+    def get_messages_between(cls, user_id, token) -> List[Message]:
         user1 = AuthToken.validate(token)
         user2 = user_repo.get_user_by_id(user_id)
         if not user2:

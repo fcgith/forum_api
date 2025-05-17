@@ -2,6 +2,7 @@ from typing import List
 
 from models.auth_model import UserCreate
 from models.category import PrivilegedUser
+from models.message import Message
 from models.user import User, UserPublic
 from data.connection import read_query, insert_query, update_query
 from services.errors import not_found
@@ -142,21 +143,21 @@ def get_user_category_permissions(user_id: int) -> dict[int, int]:
     return data
 
 
-def get_last_message_between(user: User, user2: User) -> dict:
+def get_last_message_between(user: User, user2: User) -> Message:
     query = "SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY id DESC LIMIT 1"
     result = read_query(query, (user.id, user2.id, user2.id, user.id))
-    data = {}
     if result:
         result = result[0]
-        data = {
-            "id": result[0],
-            "content": result[1],
-            "date": result[2],
-            "conversation_id": result[3],
-            "sender_id": result[4],
-            "receiver_id": result[5]
-        }
-    return data
+        message = Message(
+            id=result[0],
+            content=result[1],
+            date=result[2],
+            conversation_id=result[3],
+            sender_id=result[4]
+        )
+    else:
+        raise not_found
+    return message
 
 
 def get_users_in_conversation(conversation_id: int):
