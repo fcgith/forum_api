@@ -10,14 +10,14 @@ router = APIRouter(tags=["categories"])
 
 
 @router.get("/", response_model=List[Category])
-async def get_all_categories(token: str) -> List[Category]:
+async def get_all_categories(token: str = Header(..., alias="Authorization")) -> List[Category]:
     """
     Retrieve a list of all available categories.
 
     Parameters
     ----------
     token : str
-        Authentication token.
+        Header Authentication token.
 
     Returns
     -------
@@ -28,7 +28,8 @@ async def get_all_categories(token: str) -> List[Category]:
 
 
 @router.get("/{category_id}", response_model=Category)
-async def get_category_by_id(category_id: int, token: str) -> Category:
+async def get_category_by_id(category_id: int,
+                             token: str = Header(..., alias="Authorization")) -> Category:
     """
     Retrieve a category by its unique ID.
 
@@ -37,7 +38,7 @@ async def get_category_by_id(category_id: int, token: str) -> Category:
     category_id : int
         The ID of the category.
     token : str
-        Authentication token for user validation.
+        Header Authentication token for user validation.
 
     Returns
     -------
@@ -48,7 +49,8 @@ async def get_category_by_id(category_id: int, token: str) -> Category:
 
 
 @router.get("/{category_id}/topics", response_model=List[Topic])
-async def get_topics_by_category(category_id: int, token: str) -> List[Topic]:
+async def get_topics_by_category(category_id: int,
+                                 token: str = Header(..., alias="Authorization")) -> List[Topic]:
     """
     Retrieve a list of topics associated with a specific category.
 
@@ -57,7 +59,7 @@ async def get_topics_by_category(category_id: int, token: str) -> List[Topic]:
     category_id : int
         The ID of the category.
     token : str
-        Authentication token for user authorization.
+        Header Authentication token for user authorization.
 
     Returns
     -------
@@ -68,7 +70,8 @@ async def get_topics_by_category(category_id: int, token: str) -> List[Topic]:
 
 
 @router.post("/add", response_model=int)
-async def create_category(data: CategoryCreate, token: str) -> int:
+async def create_category(data: CategoryCreate,
+                          token: str = Header(..., alias="Authorization")) -> int:
     """
     Create a new category with the given details.
 
@@ -152,7 +155,8 @@ async def get_users_with_view_or_read_perms(category_id: int,
 
 
 @router.get("/{category_id}/check-permission")
-async def check_authenticated_user_category_permission(token: str, category_id: int):
+async def check_authenticated_user_category_permission(category_id: int,
+                                                       token: str = Header(..., alias="Authorization")):
     """
     Check the permission level (read/write) of the authenticated user for a category.
 
@@ -171,6 +175,21 @@ async def check_authenticated_user_category_permission(token: str, category_id: 
     return {"access_type": CategoryService.get_read_or_write_permission(category_id, token)}
 
 
-@router.put("/{category_id}/lock")
-async def lock_category(token: str, category_id: int):
+@router.put("/{category_id}/lock", response_model=dict)
+async def lock_category(category_id: int,
+                        token: str = Header(..., alias="Authorization")) -> dict:
+    """
+    Locks a category specified by the `category_id`.
+
+    This function is used to lock a category, preventing new topics on it.
+
+    Args:
+        token (str): Header The authentication token required for authorization to lock the
+            category.
+
+        category_id (int): The identifier of the category to be locked.
+
+    Returns:
+        The result of the lock operation as provided by the `CategoryService`.
+    """
     return CategoryService.category_lock(category_id, token)

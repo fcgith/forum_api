@@ -130,7 +130,7 @@ def update_permissions(category_id: int, user_id: int, permission: int) -> dict:
     raise database_error
 
 
-def update_locked_status(category_id: int) -> int:
+def update_locked_status(category_id: int) -> dict:
     query = "UPDATE categories SET locked = 1 WHERE id = ?"
     result = update_query(query, (category_id,))
-    return result
+    return {"message": "Category locked status updated successfully."}

@@ -134,7 +134,7 @@ class CategoryService:
                 return "no_access"
 
     @classmethod
-    def category_lock(cls, category_id, token):
+    def category_lock(cls, category_id, token) -> dict:
         AuthToken.validate_admin(token)
         category = category_repo.get_category_by_id(category_id)
         if not category:
