@@ -1,5 +1,5 @@
 from typing import List
-
+from bs4 import BeautifulSoup
 from models.reply import Reply
 from models.topic import Topic, TopicCreate
 from data.connection import read_query, insert_query, update_query
@@ -48,8 +48,12 @@ def get_topics_count_by_category(category_id: int) -> int:
 
 
 def create_topic(data: TopicCreate, user_id: int) -> int | None:
+    soup = BeautifulSoup(data.content, "html.parser")
+    for br in soup.find_all("br"):
+        br.replace_with("__BR__")
+    soup = soup.get_text().replace("__BR__", "<br />")
     query = "INSERT INTO topics (name, content, category_id, user_id) VALUES (?, ?, ?, ?)"
-    result = insert_query(query, (data.name, data.content, data.category_id, user_id))
+    result = insert_query(query, (data.name, soup, data.category_id, user_id))
     return result
 
 
