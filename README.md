@@ -76,7 +76,7 @@ A robust RESTful API backend for a modern forum system, built with **FastAPI** a
 
 ```sh
 docker build -t forum-api . 
-docker run -p 8000:8000 forum-api
+docker run -p {your external port}:8000 --name {your container name} forum-api
 ```
 
 ---
