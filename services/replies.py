@@ -55,7 +55,7 @@ class RepliesService:
         return {"message": "Reply successfully added", "id": result}
 
     @classmethod
-    def set_best_reply(cls, reply_id: int, topic_id: int, token: str) -> bool:
+    def set_best_reply(cls, reply_id: int, topic_id: int, token: str) -> dict:
         user = AuthToken.validate(token)
         topic = topics_repo.get_topic_by_id(topic_id)
 

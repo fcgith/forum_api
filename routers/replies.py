@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Header
 
 from models.reply import Reply, ReplyCreate, ReplyVote
 from services.replies import RepliesService
@@ -6,8 +6,10 @@ from services.replies import RepliesService
 router = APIRouter(tags=["replies"])
 
 
-@router.put("/best/{topic_id}/{reply_id}")
-async def select_best_reply(reply_id: int, topic_id: int, token: str):
+@router.put("/best/{topic_id}/{reply_id}", response_model=dict)
+async def select_best_reply(reply_id: int,
+                            topic_id: int,
+                            token: str = Header(..., alias="Authorization")) -> dict:
     """
     Mark a reply as the best answer for a specific topic.
 
@@ -28,8 +30,10 @@ async def select_best_reply(reply_id: int, topic_id: int, token: str):
     return RepliesService.set_best_reply(reply_id, topic_id, token)
 
 
-@router.put("/vote/{reply_id}")
-async def vote_reply(reply_id: int, vote: ReplyVote, token: str):
+@router.put("/vote/{reply_id}", response_model=dict)
+async def vote_reply(reply_id: int,
+                     vote: ReplyVote,
+                     token: str = Header(..., alias="Authorization")) -> dict:
     """
     Cast a vote (upvote or downvote) on a reply.
 
@@ -50,8 +54,9 @@ async def vote_reply(reply_id: int, vote: ReplyVote, token: str):
     return RepliesService.set_vote(reply_id, vote.vote_type, token)
 
 
-@router.get("/vote/{reply_id}")
-async def get_user_reply_vote(reply_id: int, token: str):
+@router.get("/vote/{reply_id}", response_model=int)
+async def get_user_reply_vote(reply_id: int,
+                              token: str = Header(..., alias="Authorization")) -> int:
     """
     Get the vote of a user on a given reply.
 
@@ -70,8 +75,10 @@ async def get_user_reply_vote(reply_id: int, token: str):
     return RepliesService.get_vote(reply_id, token)
 
 
-@router.post("/{topic_id}")
-async def add_reply(token: str, topic_id: int, reply: ReplyCreate):
+@router.post("/{topic_id}", response_model=dict)
+async def add_reply(topic_id: int,
+                    reply: ReplyCreate,
+                    token: str = Header(..., alias="Authorization")) -> dict:
     """
     Add a new reply to a specific topic.
 

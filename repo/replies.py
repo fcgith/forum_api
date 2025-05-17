@@ -34,7 +34,10 @@ def set_reply_vote(reply_id: int, user_id: int, vote: int) -> dict | None:
         query = "INSERT INTO votes (reply_id, user_id, type) VALUES (?, ?, ?)"
         result = insert_query(query, (reply_id, user_id, vote))
 
-    return {"success": result > 0}
+    if result > 0:
+        return {"message": "Vote updated successfully."}
+    else:
+        return {"message": "Vote not updated."}
 
 
 def get_reply_votes(reply_id: int) -> int:
@@ -50,7 +53,7 @@ def add_reply_to_topic(content: str, topic_id: int, user_id: int) -> int | None:
     return result
 
 
-def set_reply_as_best(reply_id: int, topic_id: int) -> bool | None:
+def set_reply_as_best(reply_id: int, topic_id: int) -> dict:
     query = "SELECT * FROM replies WHERE topic_id = ? AND best_reply = 1"
     result = read_query(query, (topic_id,))
     if result:
@@ -58,11 +61,11 @@ def set_reply_as_best(reply_id: int, topic_id: int) -> bool | None:
         result = update_query(query, (topic_id,))
         query = "UPDATE replies SET best_reply = 1 WHERE id = ?"
         result = update_query(query, (reply_id,))
-        return True if result else False
+        return {"message": "Best reply changed successfully."}
 
     query = "UPDATE replies SET best_reply = 1 WHERE id = ?"
     result = update_query(query, (reply_id,))
-    return True if result else False
+    return {"message": "Reply set as best successfully."}
 
 
 def get_replies_in_topic(topic_id):
