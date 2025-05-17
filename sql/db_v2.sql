@@ -5,7 +5,6 @@ create table categories
     name        varchar(45)          not null,
     description varchar(255)         null,
     hidden      tinyint(1) default 0 not null,
-    locked      int        default 0 null,
     constraint name_UNIQUE
         unique (name)
 );

@@ -11,7 +11,7 @@ pool = ConnectionPool(
     port=3600,
     user="root",
     password="root",
-    database="forum2"
+    database="forum"
 )
 
 
