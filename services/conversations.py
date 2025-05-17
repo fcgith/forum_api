@@ -18,7 +18,7 @@ class ConversationsService:
 
         last_message = user_repo.get_last_message_between(user, user2)
 
-        if not last_message.get("id"):
+        if not last_message.id:
             raise not_found
 
         return last_message
