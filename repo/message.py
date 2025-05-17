@@ -1,5 +1,5 @@
 from typing import List
-
+from bs4 import BeautifulSoup
 from models.message import Message, MessageCreate
 from data.connection import read_query, insert_query
 
@@ -32,6 +32,10 @@ def get_message_by_id(message_id: int) -> Message | None:
 
 
 def create_message(data: MessageCreate, conversation_id: int, sender_id: int) -> int | None:
+    soup = BeautifulSoup(data.content, "html.parser")
+    for br in soup.find_all("br"):
+        br.replace_with("__BR__")
+    soup = soup.get_text().replace("__BR__", "<br />")
     query = "INSERT INTO messages (content, conversation_id, sender_id, receiver_id) VALUES (?, ?, ?, ?)"
-    result = insert_query(query, (data.content, conversation_id, sender_id, data.receiver_id))
+    result = insert_query(query, (soup, conversation_id, sender_id, data.receiver_id))
     return result

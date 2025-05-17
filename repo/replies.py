@@ -1,4 +1,5 @@
 from data.connection import read_query, update_query, insert_query
+from bs4 import BeautifulSoup
 from models.reply import Reply
 from models.user import User
 from repo.user import get_user_by_id
@@ -48,8 +49,12 @@ def get_reply_votes(reply_id: int) -> int:
 
 
 def add_reply_to_topic(content: str, topic_id: int, user_id: int) -> int | None:
+    soup = BeautifulSoup(content, "html.parser")
+    for br in soup.find_all("br"):
+        br.replace_with("__BR__")
+    soup = soup.get_text().replace("__BR__", "<br />")
     query = "INSERT INTO replies (content, topic_id, user_id) VALUES (?, ?, ?)"
-    result = insert_query(query, (content, topic_id, user_id))
+    result = insert_query(query, (soup, topic_id, user_id))
     return result
 
 
