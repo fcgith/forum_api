@@ -61,7 +61,10 @@ def get_all_topics() -> dict:
     return {"pages": pages, "topics": topics}
 
 
-def get_topics(search: str = None, sort: str = "DESC", page: int = 0, category_ids: list = None) -> dict | None:
+def get_topics(search: str = None,
+               sort: str = "DESC",
+               page: int = 0,
+               category_ids: list = None) -> dict | None:
     params = []
     if isinstance(sort, str):
         sort = sort.lower()

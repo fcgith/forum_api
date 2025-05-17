@@ -20,6 +20,3 @@ class TopicCreate(BaseModel):
     content: str
     category_id: int
 
-
-class TopicResponse(Topic):
-    content: str

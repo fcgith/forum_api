@@ -1,14 +1,18 @@
-from fastapi import APIRouter
+from typing import List
 
-from models.topic import TopicCreate, TopicResponse
+from fastapi import APIRouter, Header
+
+from models.reply import Reply
+from models.topic import TopicCreate, Topic
 from services.replies import RepliesService
 from services.topics import TopicsService
 
 router = APIRouter(tags=["topics"])
 
 
-@router.post("/")
-async def create_topic(topic: TopicCreate, token: str):
+@router.post("/", response_model=dict)
+async def create_topic(topic: TopicCreate,
+                       token: str = Header(..., alias="Authorization")) -> dict:
     """
     Create a new topic.
 
@@ -21,16 +25,17 @@ async def create_topic(topic: TopicCreate, token: str):
 
     Returns
     -------
-    TopicResponse
-        The newly created topic.
+    dict
+        with topic ID and message indicating success.
     """
     return TopicsService.create_topic(topic, token)
 
 
 # TODO:  Duplicated code-  get_topic
 
-@router.get("/{topic_id}")
-async def get_topic(token: str, topic_id: int):
+@router.get("/{topic_id}", response_model=Topic)
+async def get_topic(topic_id: int,
+                    token: str = Header(..., alias="Authorization")) -> Topic:
     """
     Retrieve a topic by its ID.
 
@@ -43,15 +48,16 @@ async def get_topic(token: str, topic_id: int):
 
     Returns
     -------
-    TopicResponse
+    Topic
         The topic data.
     """
 
     return TopicsService.get_topic(topic_id, token)
 
 
-@router.get("/{topic_id}/replies")
-async def get_topic(token: str, topic_id: int):
+@router.get("/{topic_id}/replies", response_model=List[Reply])
+async def get_topic(topic_id: int,
+                    token: str = Header(..., alias="Authorization")) -> List[Reply]:
     """
     Retrieve a topic by its ID.
 
@@ -70,8 +76,11 @@ async def get_topic(token: str, topic_id: int):
     return RepliesService.get_topic_replies(topic_id, token)
 
 
-@router.get("/")
-async def get_topics(token: str, search: str = None, sort: str = "DESC", page: int = 0, ):
+@router.get("/", response_model=dict)
+async def get_topics(token: str = Header(..., alias="Authorization"),
+                     search: str = None,
+                     sort: str = "DESC",
+                     page: int = 0) -> dict:
     """
     Retrieve a list of topics with optional filtering, sorting, and pagination.
 
@@ -94,8 +103,9 @@ async def get_topics(token: str, search: str = None, sort: str = "DESC", page: i
     return TopicsService.get_topics(token=token, search=search, sort=sort, page=page)
 
 
-@router.put("/{topic_id}/lock")
-async def lock_topic(topic_id: int, token: str) -> bool:
+@router.put("/{topic_id}/lock", response_model=dict)
+async def lock_topic(topic_id: int,
+                     token: str = Header(..., alias="Authorization")) -> dict:
     """
     Lock a topic to prevent further replies.
 
@@ -108,8 +118,8 @@ async def lock_topic(topic_id: int, token: str) -> bool:
 
     Returns
     -------
-    bool
-        True if the topic was successfully locked.
+    dict
+        Message indicating success or failure.
     """
 
     return TopicsService.lock_topic_by_id(topic_id, token)

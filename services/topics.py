@@ -1,6 +1,8 @@
+from typing import List
+
 import repo.topic as topic_repo
 import repo.category as category_repo
-from models.topic import TopicCreate
+from models.topic import TopicCreate, Topic
 from services.errors import invalid_token, category_not_found, category_not_accessible, topic_not_found, internal_error, \
     category_locked
 from services.utils import AuthToken
@@ -8,7 +10,7 @@ from services.utils import AuthToken
 
 class TopicsService:
     @classmethod
-    def create_topic(cls, data: TopicCreate, token: str):
+    def create_topic(cls, data: TopicCreate, token: str) -> dict:
         """
         Create a new topic
 
@@ -37,7 +39,7 @@ class TopicsService:
         return {"topic_id": topic_id, "message": "Topic created successfully"}
 
     @classmethod
-    def get_topic(cls, topic_id: int, token: str):
+    def get_topic(cls, topic_id: int, token: str) -> Topic:
         """
         Get a topic by ID
 
@@ -59,7 +61,10 @@ class TopicsService:
         return topic
 
     @classmethod
-    def get_topics(cls, token: str, search: str, page: int = 0, sort: str = "DESC"):
+    def get_topics(cls, token: str,
+                   search: str,
+                   page: int = 0,
+                   sort: str = "DESC") -> dict:
         """
         Retrieve a list of topics with optional search, sorting, and pagination.
 
@@ -82,7 +87,7 @@ class TopicsService:
         return topic_repo.get_topics(search=search, sort=sort, page=page, category_ids=viewable_category_ids)
 
     @classmethod
-    def lock_topic_by_id(cls, topic_id, token) -> bool:
+    def lock_topic_by_id(cls, topic_id, token) -> dict:
         ## TODO: add docstring
         AuthToken.validate_admin(token)
 
@@ -90,4 +95,6 @@ class TopicsService:
         if not topic:
             raise topic_not_found
 
-        return topic_repo.lock_topic(topic_id)
+        topic_repo.lock_topic(topic_id)
+
+        return {"message": "Topic locked successfully"}
