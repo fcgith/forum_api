@@ -14,9 +14,6 @@ RUN apt-get install -y \
     procps \
     && rm -rf /var/lib/apt/lists/*
 
-# Set up SSH for Git
-RUN mkdir -p /root/.ssh && ssh-keyscan github.com >> /root/.ssh/known_hosts
-
 # Configure Git user identity
 RUN git config --global user.email "steliyan.slavov31@icloud.com" && \
     git config --global user.name "fcgith"

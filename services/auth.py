@@ -1,8 +1,6 @@
 import repo.user as user_db
 from models.auth_model import LoginResponse, UserLogin, UserCreate, RegisterResponse
-from models.user import UserPublic
-from services.errors import access_denied, internal_error, registration_user_exists, invalid_credentials, not_found, \
-    invalid_token
+from services.errors import registration_user_exists, invalid_credentials
 from services.utils import AuthToken
 import bcrypt
 

@@ -3,7 +3,7 @@ from typing import List
 from models.category import PrivilegedUser
 from models.user import User, UserPublic
 import repo.user as user_repo
-from services.errors import access_denied, not_found, internal_error, user_not_found, invalid_token
+from services.errors import user_not_found, invalid_token
 from services.utils import AuthToken
 
 

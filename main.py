@@ -17,9 +17,9 @@ app = FastAPI()
 # routers go here
 app.include_router(auth_router, prefix="/auth")
 app.include_router(user_router, prefix="/users")
+app.include_router(category_router, prefix="/categories")
 app.include_router(conversation_router, prefix="/conversations")
 app.include_router(topics_router, prefix="/topics")
-app.include_router(category_router, prefix="/categories")
 app.include_router(replies_router, prefix="/replies")
 
 

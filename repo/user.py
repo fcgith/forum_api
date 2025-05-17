@@ -27,7 +27,7 @@ def gen_user(result: tuple, public: bool = False) -> User | UserPublic:
     )
 
 
-def get_all_users() -> List[User] | None:
+def get_all_users() -> List[User]:
     """
     Returns all users if the requester is an admin and authenticated, non-public user data
     :return: User list
@@ -38,19 +38,21 @@ def get_all_users() -> List[User] | None:
     return users
 
 
-def get_user_by_id(user_id: int, public: bool = False, tup=False) -> User | UserPublic | tuple | None:
+def get_user_by_id(user_id: int,
+                   public: bool = False,
+                   tup: bool = False) -> User | UserPublic | tuple | None:
     """
     Returns User if such exists by id or UserPublic if such is requested via service
     :param user_id: int user id
     :param public: bool should private data be exposed
-    :return: User, UserPublic or None
+    :param tup: bool should the result be a tuple
+    :return: User, UserPublic, tuple or None
     """
     query = "SELECT * FROM users WHERE id = ?"
     result = read_query(query, (user_id,))
     if result:
         return gen_user(result[0], public) if not tup else result[0]
-    else:
-        return None
+    return None
 
 
 def get_user_by_username(username: str, public: bool = False) -> User | None:
