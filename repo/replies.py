@@ -75,7 +75,7 @@ def get_replies_in_topic(topic_id):
     return result
 
 
-def get_user_vote(reply: Reply, user: User):
+def get_user_vote(reply: Reply, user: User) -> dict:
     query = "SELECT type FROM votes WHERE reply_id = ? AND user_id = ? LIMIT 1"
     result = read_query(query, (reply.id, user.id))
     vote = {"vote_type": 0}

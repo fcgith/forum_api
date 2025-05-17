@@ -93,7 +93,7 @@ class RepliesService:
         return replies
 
     @classmethod
-    def get_vote(cls, reply_id, token):
+    def get_vote(cls, reply_id, token) -> dict:
         user = AuthToken.validate(token)
         reply = replies_repo.get_reply_by_id(reply_id)
         if not reply:

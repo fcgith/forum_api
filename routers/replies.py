@@ -54,9 +54,9 @@ async def vote_reply(reply_id: int,
     return RepliesService.set_vote(reply_id, vote.vote_type, token)
 
 
-@router.get("/vote/{reply_id}", response_model=int)
+@router.get("/vote/{reply_id}", response_model=dict)
 async def get_user_reply_vote(reply_id: int,
-                              token: str = Header(..., alias="Authorization")) -> int:
+                              token: str = Header(..., alias="Authorization")) -> dict:
     """
     Get the vote of a user on a given reply.
 
