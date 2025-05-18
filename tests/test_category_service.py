@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 from services.category import CategoryService
 from services.errors import not_found, access_denied, bad_request, category_not_found
+from tests.mock_db import MockConnectionPool
+
 
 class TestCategoryService(unittest.TestCase):
     def setUp(self):
@@ -10,6 +12,12 @@ class TestCategoryService(unittest.TestCase):
         self.admin_user = MagicMock(id=99, is_admin=MagicMock(return_value=True))
         self.mock_category = MagicMock(id=1, locked=0)
         self.mock_user = MagicMock(id=2)
+
+        # Mock the database connection pool
+        self.mock_pool = MockConnectionPool()
+        self.patcher = patch('data.connection.pool', self.mock_pool)
+        self.patcher.start()
+        self.addCleanup(self.patcher.stop)
 
     @patch("services.category.AuthToken.validate_admin")
     @patch("services.category.category_repo.get_all_categories")
@@ -174,6 +182,7 @@ class TestCategoryService(unittest.TestCase):
         mock_get_cat.return_value = None
         with self.assertRaises(type(category_not_found)):
             CategoryService.category_lock(1, self.token)
+
 
 if __name__ == "__main__":
     unittest.main()
