@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 from services.replies import RepliesService
 from services.errors import reply_not_found, reply_not_accessible, internal_error, topic_not_found, topic_locked
+from tests.mock_db import MockConnectionPool
+
 
 class TestRepliesService(unittest.TestCase):
     def setUp(self):
@@ -9,6 +11,12 @@ class TestRepliesService(unittest.TestCase):
         self.user = MagicMock(id=1)
         self.topic = MagicMock(id=1, category_id=1, locked=0, user_id=1)
         self.reply = MagicMock(id=2, topic_id=1)
+
+        # Mock the database connection pool
+        self.mock_pool = MockConnectionPool()
+        self.patcher = patch('data.connection.pool', self.mock_pool)
+        self.patcher.start()
+        self.addCleanup(self.patcher.stop)
 
     @patch("services.replies.AuthToken.validate")
     @patch("services.replies.replies_repo.get_reply_by_id")
@@ -180,6 +188,7 @@ class TestRepliesService(unittest.TestCase):
         mock_get_reply.return_value = None
         with self.assertRaises(type(reply_not_found)):
             RepliesService.get_vote(self.reply.id, self.token)
+
 
 if __name__ == "__main__":
     unittest.main()
