@@ -42,9 +42,6 @@ create table category_permissions
             on delete cascade
 );
 
-create index fk_category_permissions_categories1_idx
-    on category_permissions (category_id);
-
 create index fk_category_permissions_users1_idx
     on category_permissions (user_id);
 
@@ -87,7 +84,6 @@ create table messages
             on delete cascade,
     constraint fk_messages_users2
         foreign key (receiver_id) references users (id)
-            on delete cascade
 );
 
 create index fk_messages_conversations1_idx

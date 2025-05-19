@@ -177,5 +177,5 @@ cython_debug/
 .idea/
 
 # Custom
-Dockerfile
+Dockerfile_олд
 update_and_run.sh
