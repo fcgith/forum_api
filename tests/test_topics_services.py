@@ -1,7 +1,10 @@
 import unittest
 from unittest.mock import patch, MagicMock
 from services.topics import TopicsService
-from services.errors import category_not_found, category_locked, category_not_accessible, topic_not_found, internal_error
+from services.errors import category_not_found, category_locked, category_not_accessible, topic_not_found, \
+    internal_error
+from tests.mock_db import MockConnectionPool
+
 
 class TestTopicsService(unittest.TestCase):
     def setUp(self):
@@ -11,6 +14,12 @@ class TestTopicsService(unittest.TestCase):
         self.topic_data = MagicMock(name="Test Topic", content="Test Content", category_id=1)
         self.mock_category = MagicMock(id=1, locked=0)
         self.mock_topic = MagicMock(id=1, category_id=1)
+
+        # Mock the database connection pool
+        self.mock_pool = MockConnectionPool()
+        self.patcher = patch('data.connection.pool', self.mock_pool)
+        self.patcher.start()
+        self.addCleanup(self.patcher.stop)
 
     @patch("services.topics.AuthToken.validate")
     @patch("services.topics.category_repo.get_category_by_id")
@@ -129,6 +138,7 @@ class TestTopicsService(unittest.TestCase):
         mock_get_topic.return_value = None
         with self.assertRaises(type(topic_not_found)):
             TopicsService.lock_topic_by_id(1, self.token)
+
 
 if __name__ == "__main__":
     unittest.main()

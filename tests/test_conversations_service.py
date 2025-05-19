@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import patch, MagicMock
 from services.conversations import ConversationsService
 from services.errors import not_found, invalid_credentials, conversation_not_found
+from tests.mock_db import MockConnectionPool
+
 
 class TestConversationsService(unittest.TestCase):
     def setUp(self):
@@ -9,15 +11,22 @@ class TestConversationsService(unittest.TestCase):
         self.user = MagicMock(id=1)
         self.user2 = MagicMock(id=2)
 
+        # Mock the database connection pool
+        self.mock_pool = MockConnectionPool()
+        self.patcher = patch('data.connection.pool', self.mock_pool)
+        self.patcher.start()
+        self.addCleanup(self.patcher.stop)
+
     @patch("services.conversations.AuthToken.validate")
     @patch("services.conversations.user_repo.get_user_by_id")
     @patch("services.conversations.user_repo.get_last_message_between")
     def test_get_last_message_success(self, mock_last_msg, mock_get_user_by_id, mock_validate):
         mock_validate.return_value = self.user
         mock_get_user_by_id.return_value = self.user2
-        mock_last_msg.return_value = {"id": 123, "content": "hi"}
+        mock_message = MagicMock(id=123, content="hi")
+        mock_last_msg.return_value = mock_message
         result = ConversationsService.get_last_message(self.user2.id, self.token)
-        self.assertEqual(result["id"], 123)
+        self.assertEqual(result.id, 123)
 
     @patch("services.conversations.AuthToken.validate")
     @patch("services.conversations.user_repo.get_user_by_id")
@@ -46,7 +55,8 @@ class TestConversationsService(unittest.TestCase):
     @patch("services.conversations.conversation_repo.create_conversation")
     @patch("services.conversations.conversation_repo.get_conversation_by_users")
     @patch("services.conversations.message_repo.create_message")
-    def test_send_message_new_conversation(self, mock_create_msg, mock_get_conv_by_users, mock_create_conv, mock_conv_exists, mock_get_user_by_id, mock_validate):
+    def test_send_message_new_conversation(self, mock_create_msg, mock_get_conv_by_users, mock_create_conv,
+                                           mock_conv_exists, mock_get_user_by_id, mock_validate):
         mock_validate.return_value = self.user
         mock_get_user_by_id.return_value = self.user2
         mock_conv_exists.return_value = False
@@ -119,6 +129,7 @@ class TestConversationsService(unittest.TestCase):
         mock_get_conv.return_value = None
         with self.assertRaises(type(not_found)):
             ConversationsService.get_messages_between(self.user2.id, self.token)
+
 
 if __name__ == "__main__":
     unittest.main()
